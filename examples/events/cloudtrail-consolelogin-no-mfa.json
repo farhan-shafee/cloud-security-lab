@@ -1,0 +1,37 @@
+{
+  "eventVersion": "1.08",
+  "userIdentity": {
+    "type": "IAMUser",
+    "principalId": "AIDA2QExampLE7K4NZ8XY",
+    "arn": "arn:aws:iam::111122223333:user/analyst-user",
+    "accountId": "111122223333",
+    "accessKeyId": "",
+    "userName": "analyst-user"
+  },
+  "eventTime": "2026-01-10T14:31:22Z",
+  "eventSource": "signin.amazonaws.com",
+  "eventName": "ConsoleLogin",
+  "awsRegion": "us-east-1",
+  "sourceIPAddress": "198.51.100.24",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0",
+  "requestParameters": null,
+  "responseElements": {
+    "ConsoleLogin": "Success"
+  },
+  "additionalEventData": {
+    "LoginTo": "https://console.aws.amazon.com/console/home",
+    "MobileVersion": "No",
+    "MFAUsed": "No"
+  },
+  "eventID": "8f0b1d2c-3a4e-4f5a-9b6c-7d8e9f0a1b2c",
+  "readOnly": false,
+  "eventType": "AwsConsoleSignIn",
+  "managementEvent": true,
+  "recipientAccountId": "111122223333",
+  "eventCategory": "Management",
+  "tlsDetails": {
+    "tlsVersion": "TLSv1.3",
+    "cipherSuite": "TLS_AES_128_GCM_SHA256",
+    "clientProvidedHostHeader": "signin.aws.amazon.com"
+  }
+}
