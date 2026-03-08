@@ -1,0 +1,28 @@
+title: IAM Policy Version Change
+id: c9351c49-1c36-4377-984a-6d01698297e0
+status: experimental
+description: >
+  Detects creation of a new IAM policy version or a change to the default
+  version. Either can be used to silently broaden permissions, so the event is
+  worth correlating against an approved change window.
+references:
+  - https://attack.mitre.org/techniques/T1098/
+author: Farhan Shafee
+date: 2026/03/08
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventSource: iam.amazonaws.com
+    eventName:
+      - CreatePolicyVersion
+      - SetDefaultPolicyVersion
+  condition: selection
+falsepositives:
+  - Approved IAM changes inside a maintenance window
+  - Infrastructure-as-code deploys (filter on the CI/CD principal ARN)
+level: medium
+tags:
+  - attack.privilege_escalation
+  - attack.t1098

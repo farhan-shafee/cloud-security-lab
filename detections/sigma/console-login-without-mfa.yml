@@ -1,0 +1,29 @@
+title: AWS Console Login Without MFA
+id: 39393823-f82e-4ca1-ac7a-09c67cfc4146
+status: experimental
+description: >
+  Detects a successful AWS Management Console sign-in where multi-factor
+  authentication was not used. Maps to the stolen-credentials scenario in the
+  lab threat model.
+references:
+  - https://attack.mitre.org/techniques/T1078/
+  - https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html
+author: Farhan Shafee
+date: 2026/03/08
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventSource: signin.amazonaws.com
+    eventName: ConsoleLogin
+    responseElements.ConsoleLogin: Success
+    additionalEventData.MFAUsed: 'No'
+  condition: selection
+falsepositives:
+  - Documented break-glass accounts (maintain an allowlist and review monthly)
+  - SAML/federated logins where MFA is enforced at the IdP, not by AWS
+level: medium
+tags:
+  - attack.initial_access
+  - attack.t1078

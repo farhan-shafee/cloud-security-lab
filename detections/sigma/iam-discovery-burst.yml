@@ -1,0 +1,29 @@
+title: IAM and Resource Discovery Burst
+id: 343f7daa-94f3-4269-8047-95304cc432ab
+status: experimental
+description: >
+  Detects a burst of enumeration calls from a single principal, a common
+  precursor to lateral movement. Intentionally high-recall: tune the count
+  threshold and aggregation window per environment before alerting on it.
+references:
+  - https://attack.mitre.org/techniques/T1580/
+author: Farhan Shafee
+date: 2026/03/08
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventName|startswith:
+      - List
+      - Describe
+      - GetAccountAuthorizationDetails
+  timeframe: 5m
+  condition: selection | count() by userIdentity.arn > 50
+falsepositives:
+  - Backup, inventory, and CSPM tools enumerate constantly (allowlist them)
+  - First run of a new automation account
+level: low
+tags:
+  - attack.discovery
+  - attack.t1580
