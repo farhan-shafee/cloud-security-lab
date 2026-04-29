@@ -5,6 +5,8 @@ required_files=(
   "README.md"
   "docs/methodology.md"
   "docs/threat-model.md"
+  "docs/triage-runbook.md"
+  "detections/cloud-detections.md"
   "examples/iam/least-privilege-policy.json"
   "examples/events/cloudtrail-consolelogin-no-mfa.json"
 )

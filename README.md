@@ -82,13 +82,22 @@ Action: Verify user legitimacy, enforce MFA policy, and review related API activ
 - Lightweight automation/validation for repeatability.
 
 ## Repository Map
-- `docs/` - methodology, architecture, threat model, remediation checklist.
+- `docs/` - methodology, architecture, threat model, remediation checklist, triage runbook.
 - `baseline-configs/` - baseline hardening guidance.
 - `examples/iam/` - least-privilege and over-privileged policy examples + analysis.
 - `examples/events/` - CloudTrail-style and GuardDuty-style sample events.
 - `reports/` - sample findings and assessment report artifacts.
+- `detections/` - detection logic and analyst-oriented pseudo-queries.
+- `compliance-mapping.md` - conceptual control mappings to common standards.
 - `scripts/` - validation helpers.
 - `.github/workflows/` - CI checks.
+
+
+## SOC / Cloud Security Analyst Portfolio Artifacts
+- Detection content: `detections/cloud-detections.md`
+- Triage runbook: `docs/triage-runbook.md`
+- Sample findings/report package: `reports/sample-findings.md`, `reports/sample-security-report.md`
+- Control mapping reference: `compliance-mapping.md`
 
 ## Limitations
 - Uses sample data and representative configurations.
