@@ -1,0 +1,20 @@
+{
+  "eventVersion": "1.08",
+  "eventSource": "signin.amazonaws.com",
+  "eventName": "ConsoleLogin",
+  "awsRegion": "us-east-1",
+  "sourceIPAddress": "198.51.100.24",
+  "userAgent": "Mozilla/5.0",
+  "requestParameters": null,
+  "responseElements": {
+    "ConsoleLogin": "Success"
+  },
+  "additionalEventData": {
+    "MFAUsed": "No"
+  },
+  "userIdentity": {
+    "type": "IAMUser",
+    "userName": "analyst-user"
+  },
+  "eventTime": "2026-04-20T14:31:22Z"
+}
