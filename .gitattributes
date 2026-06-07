@@ -1,0 +1,12 @@
+# Keep line endings consistent across Windows / macOS / Linux checkouts.
+# Without this, editing on Windows (or OneDrive) rewrites every file to CRLF
+# and produces huge, meaningless diffs.
+* text=auto eol=lf
+
+# Shell scripts must stay LF even on a Windows checkout, or bash chokes.
+*.sh text eol=lf
+
+# Binary assets: no end-of-line conversion, no diffing.
+*.png binary
+*.jpg binary
+*.bundle binary
