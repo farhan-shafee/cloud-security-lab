@@ -55,7 +55,7 @@ commit occurs only after validation. No cloud access is authorized or needed.
 - [x] Replace stale docs/reports with exact implemented behavior; retain useful
   IAM/Sigma/GuardDuty examples labeled by scope. Primary AWS references replace
   unsupported certification-style mappings. Add interview and portfolio guides.
-- [ ] Run formatting, lint, typing, tests, fixture truth, demo, Bandit, dependency
+- [x] Run formatting, lint, typing, tests, fixture truth, demo, Bandit, dependency
   audit and secret scan. CI covers Windows/Linux. Record actual results, inspect
   diff and generated evidence, independently review, fix defects, then commit,
   push, update focused metadata, and verify GitHub CI.
@@ -66,3 +66,10 @@ ground-truth independence and reproducible reports. Each is tested at its owning
 boundary. Runtime remains standard library only; development tools are bounded
 and locked separately. Terraform is omitted because it would introduce a second
 parser without strengthening this focused assessment/verification proof.
+
+Completion evidence is recorded in [VALIDATION.md](VALIDATION.md), including the
+implementation commit and successful six-job GitHub CI run. Independent review
+identified malformed event timezone handling; the fix was verified with failing
+regression tests followed by a passing full suite. Verification also rejects
+classification/location changes so changing assessment scope cannot stand in
+for synthetic remediation.

@@ -1,10 +1,11 @@
 # Executed validation record
 
 Local validation: **2026-09-23 20:03 UTC**, Windows PowerShell, CPython **3.14.7**.
-Starting commit: `caf0ac8263056cd8cb5584b6e9bf3d618b1af426`; these results were
-executed against the implementation working tree before its first commit.
-The commit containing this record identifies that candidate. Remote CI results
-will be recorded separately after publication; no remote result is claimed here.
+Starting commit: `caf0ac8263056cd8cb5584b6e9bf3d618b1af426`. Local results below
+were executed against the candidate subsequently committed and pushed as
+[`93cbdab11643ba6c485ca63091ea09ff7da1fb08`](https://github.com/farhan-shafee/cloud-security-lab/commit/93cbdab11643ba6c485ca63091ea09ff7da1fb08).
+This documentation follow-up records the observed remote result without changing
+the tested implementation.
 
 The interpreter for development checks was `.venv/Scripts/python.exe`. The
 credential-free runtime was also exercised using system `python -S`, which
@@ -25,6 +26,7 @@ disables site packages. Tool versions are pinned in `requirements-dev.lock`.
 | `python -m pip check` | No broken requirements. |
 | `python scripts/secret_scan.py --gitleaks .tools/gitleaks/gitleaks.exe` | Gitleaks 8.30.1: no leaks in the 17-commit existing history or the nonignored working source snapshot. |
 | `python -m build` | Built source distribution and wheel successfully. |
+| Extracted source-distribution tests | 190 passed. A sandbox cache-directory warning did not affect execution. |
 | `git diff --check` | Passed. |
 
 Gitleaks Windows x64 archive was checked against the upstream release SHA-256:
@@ -62,6 +64,21 @@ the assessment, detection, fixture truth and demo workflows remain offline.
 Sigma YAML checks verify reference-file structure, not backend conversion or
 runtime execution. Fixture hashes do not authenticate authors or AWS state.
 
-CI is configured for Python 3.11 and 3.14 on Windows and Linux, plus Linux
-quality/build and dependency/secret jobs. Local Windows execution alone does not
-establish that those remote jobs passed.
+## Verified GitHub CI and publication
+
+[CI run 35913883851](https://github.com/farhan-shafee/cloud-security-lab/actions/runs/35913883851)
+completed successfully for implementation commit `93cbdab11643ba6c485ca63091ea09ff7da1fb08`.
+All six jobs passed: Quality, Dependencies and secrets, and tests on Ubuntu and
+Windows with Python 3.11 and 3.14. The test jobs also validate fixtures, compare
+committed generated evidence byte-for-byte, and execute the offline demo.
+
+The implementation was pushed to `origin/main`; the remote SHA was read back and
+matched the local commit. Repository metadata was updated and read back:
+
+- Description: "Deterministic AWS-style cloud posture assessment, audit-event
+  detection, and remediation verification using synthetic fixtures."
+- Topics: `cloud-security`, `aws-iam`, `least-privilege`, `security-automation`, `python`.
+
+No profile repository or AWS account was changed. A later documentation commit
+may have its own CI run; the linked result above identifies exactly which
+implementation was verified.
