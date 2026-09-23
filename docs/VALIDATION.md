@@ -79,6 +79,12 @@ matched the local commit. Repository metadata was updated and read back:
   detection, and remediation verification using synthetic fixtures."
 - Topics: `cloud-security`, `aws-iam`, `least-privilege`, `security-automation`, `python`.
 
-No profile repository or AWS account was changed. A later documentation commit
-may have its own CI run; the linked result above identifies exactly which
-implementation was verified.
+CI subsequently reported deprecated Action runtimes. The workflow was updated
+to commit-pinned `actions/checkout` v7.0.1 and `actions/setup-python` v7.0.0 in
+`812454f09034b554930d27899fed22ec66b1ba5c`.
+[CI run 35914295043](https://github.com/farhan-shafee/cloud-security-lab/actions/runs/35914295043)
+then passed all six jobs with the updated runtime pins. The Python implementation
+and generated evidence are unchanged from the implementation commit above.
+
+No profile repository or AWS account was changed. These run links identify the
+exact revisions verified; later documentation commits have their own CI runs.
