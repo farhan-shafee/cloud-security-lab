@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "fixture_id": "login-federated",
+  "events": [
+    {
+      "eventID": "login",
+      "eventTime": "2026-01-10T14:00:00Z",
+      "eventSource": "signin.amazonaws.com",
+      "eventName": "ConsoleLogin",
+      "awsRegion": "us-east-1",
+      "recipientAccountId": "111122223333",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "arn": "arn:aws:sts::111122223333:assumed-role/FederatedRole/session-one",
+        "accountId": "111122223333"
+      },
+      "sourceIPAddress": "198.51.100.24",
+      "eventType": "AwsConsoleSignIn",
+      "requestParameters": {},
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "additionalEventData": {
+        "MFAUsed": "No"
+      }
+    }
+  ]
+}

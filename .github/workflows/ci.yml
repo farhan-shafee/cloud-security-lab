@@ -2,27 +2,73 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  validate:
+  quality:
+    name: Quality
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          python-version: '3.11'
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.14'
+      - run: python -m pip install -r requirements-dev.lock
+      - run: python -m pip install -e .
+      - run: python -m ruff format --check .
+      - run: python -m ruff check .
+      - run: python -m mypy
+      - run: python -m bandit -q -r cloud_security_lab scripts
+      - run: python -m build
 
-      - name: Byte-compile the linter
-        run: python3 -m py_compile scripts/analyze_policy.py
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.14']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r requirements-dev.lock
+      - run: python -m pip install -e .
+      - run: python -m pytest -q
+      - run: python scripts/validate_lab.py
+      - run: python -m cloud_security_lab demo --check reports/generated
+      - run: python -m cloud_security_lab demo
 
-      - name: Run repo validation
-        run: make validate
-
-      - name: Confirm the linter catches the bad policy
+  security:
+    name: Dependencies and secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.14'
+      - run: python -m pip install -r requirements-dev.lock
+      - run: python -m pip_audit -r requirements-dev.lock --progress-spinner off
+      - name: Install checksum-verified Gitleaks 8.30.1
+        shell: bash
         run: |
-          if python3 scripts/analyze_policy.py examples/iam/overprivileged-policy.json; then
-            echo "linter failed to flag the over-privileged policy" && exit 1
-          fi
+          mkdir -p .tools
+          curl --fail --silent --show-error --location https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz -o .tools/gitleaks.tar.gz
+          echo '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  .tools/gitleaks.tar.gz' | sha256sum -c -
+          tar -xzf .tools/gitleaks.tar.gz -C .tools
+      - run: python scripts/secret_scan.py --gitleaks .tools/gitleaks

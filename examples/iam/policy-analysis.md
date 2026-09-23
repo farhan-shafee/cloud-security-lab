@@ -1,77 +1,25 @@
-# IAM policy analysis
+# IAM policy walkthrough
 
-Three policies, read the way you'd read them in a review: the obviously bad one,
-the one that's actually fine, and the one that looks fine and isn't. The third is
-the point — the dangerous policies in real accounts rarely say `Action: *`.
+These three original documents remain standalone teaching inputs. They are evaluated by the same static IAM logic used for snapshot assessment:
 
-Run any of them through the linter to see the same reasoning in tool form:
-
-```bash
-python3 scripts/analyze_policy.py examples/iam/subtle-overprivilege-policy.json
+```console
+python scripts/analyze_policy.py examples/iam/overprivileged-policy.json
+python scripts/analyze_policy.py examples/iam/least-privilege-policy.json
+python scripts/analyze_policy.py examples/iam/subtle-overprivilege-policy.json
 ```
 
-## Policy A — `overprivileged-policy.json`
+## Broad grant
 
-```json
-{ "Effect": "Allow", "Action": "*", "Resource": "*" }
-```
+`overprivileged-policy.json` contains Allow `Action: *`, `Resource: *`. This is an administrative grant pattern and also encompasses selected sensitive IAM mutations and role passing. The analyzer reports the statement evidence. It cannot conclude that the holder can perform every account operation: explicit denies, boundaries, Organizations policies, resource policies, and runtime context are not evaluated. [AWS evaluation logic](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic_policy-eval-denyallow.html).
 
-**Read:** this grants every action on every resource. It is administrator access
-by another name.
+## Scoped S3 example
 
-**Risk:** any principal holding this can do anything in the account, including
-deleting logs and creating new admin users. If the credential leaks, the whole
-account is gone — there's no blast-radius left to contain.
+`least-privilege-policy.json` names `s3:GetObject`, `s3:ListBucket`, one bucket, an object prefix, and a TLS condition. Its historical filename is retained; a clean lint result is not proof of least privilege.
 
-**Fix:** delete it. Replace with task-scoped statements naming the exact actions
-and resource ARNs the principal needs. If something genuinely needs broad
-access, it should be a tightly controlled role with MFA and a condition, not a
-standing user policy.
+The object ARN limits object reads to `app/*`. Bucket listing is not restricted by an `s3:prefix` condition and can reveal names elsewhere in the bucket. The TLS condition constrains this Allow; it is not a global explicit Deny for plaintext requests. The policy is not attached to a modeled analyst role. See [AWS S3 condition examples](https://docs.aws.amazon.com/AmazonS3/latest/userguide/amazon-s3-policy-keys.html).
 
-## Policy B — `least-privilege-policy.json`
+## Subtle overprivilege
 
-```json
-{ "Effect": "Allow",
-  "Action": ["s3:GetObject", "s3:ListBucket"],
-  "Resource": ["arn:aws:s3:::portfolio-lab-app-logs",
-               "arn:aws:s3:::portfolio-lab-app-logs/app/*"],
-  "Condition": { "Bool": { "aws:SecureTransport": "true" } } }
-```
+`subtle-overprivilege-policy.json` scopes `s3:*` to a bucket but retains broad action coverage. Its `iam:PassRole` grant on `*` also deserves review. Passing a powerful role becomes dangerous when a principal can use a service with that role; the static check does not prove the complete escalation path. Scope approved roles and consider the `iam:PassedToService` condition. [AWS PassRole guidance](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html).
 
-**Read:** read-only access to one bucket and one prefix, and only over TLS.
-
-**Why it's good:** named actions, named resources, and a condition that blocks
-plaintext access. This is the shape a log-reader or read-only analyst role should
-have. The blast radius if it leaks is "someone can read app logs over HTTPS" —
-bad, but bounded.
-
-The linter exits clean on this one. That's the bar.
-
-## Policy C — `subtle-overprivilege-policy.json`
-
-```json
-{ "Sid": "AppBucketFullAccess", "Action": "s3:*",
-  "Resource": ["arn:aws:s3:::portfolio-lab-app-logs",
-               "arn:aws:s3:::portfolio-lab-app-logs/*"] }
-{ "Sid": "PassAnyRole", "Action": "iam:PassRole", "Resource": "*" }
-```
-
-**Read:** this is the one that passes a casual glance. The resources *are*
-scoped to the app bucket, so it looks careful. Two problems:
-
-1. **`s3:*` is a service-wide wildcard.** Scoped to a bucket, yes, but it still
-   grants `DeleteBucket`, `PutBucketPolicy`, `PutBucketAcl` — i.e. the holder can
-   make the bucket public or delete it. "Scoped resource" is not the same as
-   "scoped action."
-2. **`iam:PassRole` on `Resource: *`** is the quiet privilege-escalation primitive.
-   It lets the principal hand *any* role to a service it can invoke, which is a
-   well-worn path from "limited user" to "whatever that role can do."
-
-**Fix:** replace `s3:*` with the specific actions the app needs
-(`GetObject`/`PutObject`/`ListBucket`), and constrain `iam:PassRole` to the single
-role ARN the workload is supposed to pass, ideally with an
-`iam:PassedToService` condition.
-
-**Lesson:** review the *actions* and the *resources* separately. A policy can be
-careful about one and reckless about the other, and the reckless half is usually
-the one that gets you.
+Review actions, resources, trust, and the task requirement separately. Some AWS operations require wildcard resources. The lab intentionally flags those for review and does not ship a complete service authorization catalog. See [supported IAM semantics](../../docs/controls.md).

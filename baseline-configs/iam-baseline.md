@@ -1,35 +1,18 @@
-# IAM baseline
+# IAM review baseline
 
-The standard the lab measures policies against. Short on purpose — a baseline you
-can't recite isn't one you'll apply.
+The executable checks are `IAM-001` through `IAM-006`; their predicates and limits are in the [control catalog](../docs/controls.md).
 
-## Principles
+| Review condition | Check |
+|---|---|
+| Allow action contains `*` or `?` | IAM-001 |
+| Allow resource is exactly `*` | IAM-002 |
+| Allow action pattern includes selected sensitive IAM mutations | IAM-003 |
+| Allow can match `iam:PassRole` and uses a wildcard resource | IAM-004 |
+| Allow trust names wildcard principal | IAM-005 |
+| Unconditioned AssumeRole trust delegates to an external account ID/root | IAM-006 |
 
-Identity is the account boundary in cloud, so the rules here are stricter than
-they'd be for, say, a firewall ruleset.
+These are conservative static review rules. A finding is not proof that the grant is usable. Deny statements, boundaries, SCPs, resource policies, and request conditions can change effective authorization. `Resource: *` is required for some AWS actions and is therefore a review signal, not automatically a least-privilege violation.
 
-- **Deny by default; grant a named need.** Every `Allow` should trace to a
-  specific thing a specific principal has to do.
-- **Separate human and workload identities.** People assume roles; workloads use
-  roles directly. They don't share credentials.
-- **Prefer role assumption over long-lived keys.** Short-lived credentials beat a
-  key sitting in a config file for months.
-- **MFA on privileged interactive actions**, no exceptions that aren't written
-  down.
+Human/workload separation, MFA enforcement, unused-key review, and authorization against business requirements remain useful review questions, but are not snapshot controls in this lab. The event detector observes selected MFA/key activity; that does not establish account-wide identity posture.
 
-## Controls the lab checks for
-
-1. No administrative wildcard policies attached to day-to-day users.
-2. A read-only `security-audit` role for analysts, separate from anything that
-   can change the workload.
-3. Explicit deny on destructive actions outside the roles meant to perform them.
-4. Scheduled review of stale permissions and unused keys.
-
-## Questions to ask of any policy
-
-- Can this principal do *only* what it's supposed to, or more?
-- Are the sensitive actions gated behind a role plus MFA?
-- If there's a wildcard, is it on the action, the resource, or both — and is it
-  written down why?
-
-`scripts/analyze_policy.py` automates the first and third of these.
+Run `python -m cloud_security_lab assess fixtures/accounts/risky-environment.json` or use the preserved [policy analyzer](../examples/iam/policy-analysis.md) on standalone documents.

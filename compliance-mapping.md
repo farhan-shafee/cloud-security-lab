@@ -1,28 +1,16 @@
-# Control mapping
+# Related control references
 
-Each control the lab exercises, mapped to the matching CIS AWS Foundations
-Benchmark (v1.4.0) recommendation and NIST SP 800-53 Rev 5 control, with a
-pointer to the file that demonstrates it.
+This is an educational reference map, not a compliance assessment, certification, CIS benchmark implementation, NIST conformity assertion, or substitute for AWS native security services. Only executable checks are listed. References explain relevant AWS behavior; they do not endorse the lab's severity or prove its checks complete.
 
-This is a self-assessment for learning, not an audit assertion. It shows the lab
-controls *line up* with recognized references — it doesn't claim a certified
-environment.
+| Implemented checks | Related reference | Boundary of the check |
+|---|---|---|
+| IAM-001–IAM-003: broad statements and selected mutations | [AWS policy evaluation](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic_policy-eval-denyallow.html), [Resource element](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_resource.html) | Static statement review; no effective authorization, and some actions require `Resource: *`. |
+| IAM-004: wildcard role passing | [AWS PassRole](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html) | Permission-pattern review; no complete escalation-path proof. |
+| IAM-005–IAM-006: selected broad trust | [AWS Principal element](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html) | Selected principal/condition patterns, not full trust evaluation. |
+| S3-001: missing bucket Block Public Access flags | [S3 Block Public Access](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html) | Guardrail gap; account/organization/access-point settings and policies are not evaluated. |
+| S3-002: sensitive bucket encryption policy | [S3 encryption defaults](https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html) | Lab requires customer-managed SSE-KMS; SSE-S3 is encrypted, not an unencrypted bucket. |
+| S3-003: versioning | [S3 Versioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html) | Boolean configuration check; does not prove retention or immutability. |
+| NET-001–NET-002: world-open ingress | [VPC security-group rules](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html) | Selected ingress predicates; no end-to-end reachability analysis. |
+| LOG-001–LOG-003: trail and destination configuration | [Multi-Region trails](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/receive-cloudtrail-log-files-from-multiple-regions.html), [CloudTrail integrity validation](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html) | Modeled logging/coverage/bucket baseline; no delivery, selectors, retention, or signed-digest verification. |
 
-| Lab control | CIS AWS Foundations v1.4.0 | NIST 800-53 Rev 5 | Evidence |
-|---|---|---|---|
-| MFA for interactive users | 1.10 | IA-2(1) | `docs/remediation-checklist.md`, detection `sigma/console-login-without-mfa.yml` |
-| No full-admin wildcard policies | 1.16 | AC-6, AC-6(1) | `examples/iam/overprivileged-policy.json`, `scripts/analyze_policy.py` |
-| Least-privilege IAM policies | 1.15 | AC-6 | `examples/iam/least-privilege-policy.json` |
-| Multi-region audit logging | 3.1 | AU-2, AU-12 | `examples/logging-setup.md` |
-| Log file integrity / tamper-evidence | 3.2 | AU-9 | `examples/logging-setup.md` |
-| Restrict public admin ports | 5.2 | SC-7, AC-4 | `baseline-configs/network-baseline.md` |
-| Detection + triage workflow | — | IR-4, SI-4 | `docs/triage-runbook.md`, `detections/cloud-detections.md` |
-
-## Notes
-
-- CIS numbering shifts between benchmark versions; the IDs above are pinned to
-  v1.4.0. If you compare against v3.0 the recommendation text is stable but the
-  numbers move.
-- The triage workflow has no single CIS line because CIS is mostly
-  configuration-state; the process controls map more naturally to the NIST IR
-  family.
+Earlier CIS/NIST IDs were removed because several pointed only to prose or broader controls than the code demonstrates. Any future framework mapping needs a versioned source, exact applicability, executable evidence, and a documented gap analysis. [The control catalog](docs/controls.md) is the authoritative description of lab predicates.

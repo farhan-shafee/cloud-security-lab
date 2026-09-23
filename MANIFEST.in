@@ -1,0 +1,8 @@
+include requirements-dev.lock
+include Makefile CONTRIBUTING.md SECURITY.md CHANGELOG.md compliance-mapping.md
+recursive-include scripts *.py *.sh
+recursive-include baseline-configs *.md
+recursive-include fixtures *.json
+recursive-include examples *.json *.md
+recursive-include reports *.json *.md
+recursive-include docs *.md

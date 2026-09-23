@@ -1,0 +1,1001 @@
+# Synthetic cloud security evidence
+
+Generated from synthetic configuration/audit fixtures. No AWS services were contacted. PASS and closure apply only to modeled predicates.
+
+## Assessment metadata
+
+```json
+{
+  "after": {
+    "account_id": "111122223333",
+    "captured_at": "2026-09-23T13:00:00Z",
+    "snapshot_id": "remediated-20260923",
+    "source_sha256": "049a33d0d9000990a1dcae4843856c8df9a61e5326f4cc1b0946a384c6ede82e"
+  },
+  "before": {
+    "account_id": "111122223333",
+    "captured_at": "2026-09-23T12:00:00Z",
+    "snapshot_id": "risky-20260923",
+    "source_sha256": "56e88e6dea5aea1b2b47cc167ce392a8c4c76ce95d684a143a5d27cd5ac1feb4"
+  },
+  "controls_executed": [
+    "IAM-001",
+    "IAM-002",
+    "IAM-003",
+    "IAM-004",
+    "IAM-005",
+    "IAM-006",
+    "S3-001",
+    "S3-002",
+    "S3-003",
+    "NET-001",
+    "NET-002",
+    "LOG-001",
+    "LOG-002",
+    "LOG-003"
+  ],
+  "limitations": [
+    "Fixture timestamps and contents are supplied evidence, not authenticated AWS records.",
+    "Hashes identify input bytes; they do not prove their origin or integrity.",
+    "Closure proves only that this control no longer detects the modeled condition."
+  ],
+  "open": 0,
+  "schema_version": 1,
+  "success": true,
+  "synthetic": true,
+  "verified_closed": 17,
+  "workflow": "synthetic configuration remediation verification"
+}
+```
+
+## Findings
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-001",
+    "resource_id": "workload-policy",
+    "resource_type": "iam_policy",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "document": {
+      "statements": [
+        {
+          "actions": [
+            "s3:GetObject"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [],
+          "resources": [
+            "arn:aws:s3:::synthetic-data/*"
+          ],
+          "sid": "ReadObjects"
+        }
+      ]
+    },
+    "id": "workload-policy"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-001",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": [
+        "*"
+      ],
+      "statement_id": "Overbroad"
+    }
+  ],
+  "finding_id": "finding-d23f5e42fc9e84aaab990897",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "Both '*' and '?' action patterns are flagged; a read-only pattern is not itself privilege escalation."
+  ],
+  "reason": "Wildcard action requires least-privilege review; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html"
+  ],
+  "remediation": "Replace action wildcards with the operations the workload demonstrably needs.",
+  "resource_id": "workload-policy",
+  "resource_type": "iam_policy",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Wildcard action requires least-privilege review"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-002",
+    "resource_id": "workload-policy",
+    "resource_type": "iam_policy",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "document": {
+      "statements": [
+        {
+          "actions": [
+            "s3:GetObject"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [],
+          "resources": [
+            "arn:aws:s3:::synthetic-data/*"
+          ],
+          "sid": "ReadObjects"
+        }
+      ]
+    },
+    "id": "workload-policy"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-002",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": "Resource: *",
+      "statement_id": "Overbroad"
+    }
+  ],
+  "finding_id": "finding-de64f39c47df82808241e065",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "Some AWS actions require Resource '*'; this rule does not use a service authorization database."
+  ],
+  "reason": "Universal resource requires scope review; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html"
+  ],
+  "remediation": "Scope supported actions to named resources; document actions for which AWS requires Resource '*'.",
+  "resource_id": "workload-policy",
+  "resource_type": "iam_policy",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Universal resource requires scope review"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-003",
+    "resource_id": "workload-policy",
+    "resource_type": "iam_policy",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "document": {
+      "statements": [
+        {
+          "actions": [
+            "s3:GetObject"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [],
+          "resources": [
+            "arn:aws:s3:::synthetic-data/*"
+          ],
+          "sid": "ReadObjects"
+        }
+      ]
+    },
+    "id": "workload-policy"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-003",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": [
+        "iam:CreatePolicyVersion",
+        "iam:SetDefaultPolicyVersion",
+        "iam:AttachUserPolicy",
+        "iam:AttachRolePolicy",
+        "iam:AttachGroupPolicy",
+        "iam:PutUserPolicy",
+        "iam:PutRolePolicy",
+        "iam:PutGroupPolicy",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:CreateAccessKey"
+      ],
+      "statement_id": "Overbroad"
+    }
+  ],
+  "finding_id": "finding-5effc13ad0fd6ef27a72bc92",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "The selected action list is bounded; matching a mutation capability does not prove an exploitable escalation path."
+  ],
+  "reason": "Selected IAM mutation capability requires review; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html"
+  ],
+  "remediation": "Remove unneeded policy, trust and credential mutation permissions; scope and independently review necessary administration.",
+  "resource_id": "workload-policy",
+  "resource_type": "iam_policy",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "Selected IAM mutation capability requires review"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-004",
+    "resource_id": "workload-policy",
+    "resource_type": "iam_policy",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "document": {
+      "statements": [
+        {
+          "actions": [
+            "s3:GetObject"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [],
+          "resources": [
+            "arn:aws:s3:::synthetic-data/*"
+          ],
+          "sid": "ReadObjects"
+        }
+      ]
+    },
+    "id": "workload-policy"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-004",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": [
+        "*"
+      ],
+      "statement_id": "Overbroad"
+    }
+  ],
+  "finding_id": "finding-0443ea8db4ce18c6acc695c4",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "PassRole alone is not sufficient to execute a role's permissions."
+  ],
+  "reason": "PassRole includes a wildcard resource; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html"
+  ],
+  "remediation": "Restrict PassRole to explicit role ARNs and review allowed destination services and downstream permissions.",
+  "resource_id": "workload-policy",
+  "resource_type": "iam_policy",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "PassRole includes a wildcard resource"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-005",
+    "resource_id": "workload-role",
+    "resource_type": "iam_role",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "id": "workload-role",
+    "trust_policy": {
+      "statements": [
+        {
+          "actions": [
+            "sts:AssumeRole"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [
+            [
+              "Service",
+              "ec2.amazonaws.com"
+            ]
+          ],
+          "resources": [],
+          "sid": "statement-1"
+        }
+      ]
+    }
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-005",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": "wildcard Principal",
+      "statement_id": "World"
+    }
+  ],
+  "finding_id": "finding-7c60c848eacdac8256dd5f4d",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "A wildcard principal is flagged even when a condition exists; conditions may materially restrict trust."
+  ],
+  "reason": "Wildcard role trust principal; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html"
+  ],
+  "remediation": "Use explicit trusted principals and review trust conditions for the intended callers.",
+  "resource_id": "workload-role",
+  "resource_type": "iam_role",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "Wildcard role trust principal"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "IAM-006",
+    "resource_id": "workload-role",
+    "resource_type": "iam_role",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "id": "workload-role",
+    "trust_policy": {
+      "statements": [
+        {
+          "actions": [
+            "sts:AssumeRole"
+          ],
+          "conditions": [],
+          "effect": "Allow",
+          "principals": [
+            [
+              "Service",
+              "ec2.amazonaws.com"
+            ]
+          ],
+          "resources": [],
+          "sid": "statement-1"
+        }
+      ]
+    }
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "IAM-006",
+  "evidence": [
+    {
+      "condition_present": false,
+      "effect": "Allow",
+      "matched": [
+        "arn:aws:iam::444455556666:root"
+      ],
+      "statement_id": "VendorRoot"
+    }
+  ],
+  "finding_id": "finding-dae10336f136adf891d31adc",
+  "limitations": [
+    "Static Allow lint only; conditions, Deny, SCPs, boundaries, sessions and resource policies are not evaluated as effective permissions.",
+    "Only external 12-digit account IDs and account-root ARNs are checked; condition presence passes this lint but does not establish trust safety."
+  ],
+  "reason": "External account or root trust lacks a condition; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html"
+  ],
+  "remediation": "Review delegated external-account trust and add appropriate controls such as a vendor ExternalId when applicable.",
+  "resource_id": "workload-role",
+  "resource_type": "iam_role",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "External account or root trust lacks a condition"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "LOG-001",
+    "resource_id": "account-trail",
+    "resource_type": "cloudtrail",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "covered_regions": [
+      "us-east-1",
+      "us-west-2"
+    ],
+    "home_region": "us-east-1",
+    "id": "account-trail",
+    "is_logging": true,
+    "is_multi_region": true,
+    "log_bucket": "synthetic-logs"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "LOG-001",
+  "evidence": [
+    {
+      "is_logging": false
+    }
+  ],
+  "finding_id": "finding-1be068172a10d10c09383a70",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "is_logging is an authored configuration observation; this does not test actual delivery or management/data event selectors."
+  ],
+  "reason": "Configured trail logging is disabled; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html"
+  ],
+  "remediation": "Enable logging for the configured trail and independently confirm log delivery.",
+  "resource_id": "account-trail",
+  "resource_type": "cloudtrail",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "Configured trail logging is disabled"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "LOG-002",
+    "resource_id": "account-trail",
+    "resource_type": "cloudtrail",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "covered_regions": [
+      "us-east-1",
+      "us-west-2"
+    ],
+    "home_region": "us-east-1",
+    "id": "account-trail",
+    "is_logging": true,
+    "is_multi_region": true,
+    "log_bucket": "synthetic-logs"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "LOG-002",
+  "evidence": [
+    {
+      "covered_regions": [
+        "us-east-1"
+      ],
+      "missing_regions": [
+        "us-west-2"
+      ],
+      "required_regions": [
+        "us-east-1",
+        "us-west-2"
+      ]
+    }
+  ],
+  "finding_id": "finding-9411f5c9ff07a01a21853741",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Each supplied trail is checked independently against required_regions; other trails and organization coverage are not inferred."
+  ],
+  "reason": "Configured trail omits required regions; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html"
+  ],
+  "remediation": "Configure this trail to cover every region declared in required_regions.",
+  "resource_id": "account-trail",
+  "resource_type": "cloudtrail",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Configured trail omits required regions"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "LOG-003",
+    "resource_id": "account-trail",
+    "resource_type": "cloudtrail",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "covered_regions": [
+      "us-east-1",
+      "us-west-2"
+    ],
+    "home_region": "us-east-1",
+    "id": "account-trail",
+    "is_logging": true,
+    "is_multi_region": true,
+    "log_bucket": "synthetic-logs"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "LOG-003",
+  "evidence": [
+    {
+      "customer_managed_sse_kms": false,
+      "disabled_bucket_settings": [
+        "block_public_policy"
+      ],
+      "log_bucket": "synthetic-logs",
+      "versioning": false
+    }
+  ],
+  "finding_id": "finding-93b2cd2890fa5c061c47b2a9",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Only included destination bucket settings are inspected; bucket/key permissions, delivery, digest validation and Object Lock are outside scope."
+  ],
+  "reason": "Trail destination lacks required storage safeguards; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+  ],
+  "remediation": "Enable all bucket public-access blocks, customer-managed default SSE-KMS and versioning on the log destination.",
+  "resource_id": "account-trail",
+  "resource_type": "cloudtrail",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Trail destination lacks required storage safeguards"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "NET-001",
+    "resource_id": "sg-workload",
+    "resource_type": "security_group",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "id": "sg-workload",
+    "ingress": [
+      {
+        "cidr": "0.0.0.0/0",
+        "from_port": 443,
+        "protocol": "tcp",
+        "to_port": 443
+      },
+      {
+        "cidr": "10.0.0.0/8",
+        "from_port": 22,
+        "protocol": "tcp",
+        "to_port": 22
+      }
+    ],
+    "region": "us-east-1"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "NET-001",
+  "evidence": [
+    {
+      "cidr": "0.0.0.0/0",
+      "from_port": null,
+      "protocol": "-1",
+      "to_port": null
+    },
+    {
+      "cidr": "::/0",
+      "from_port": 3389,
+      "protocol": "tcp",
+      "to_port": 3389
+    }
+  ],
+  "finding_id": "finding-8a64b5057ccb0b69eb9f987c",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Checks only /0 IPv4 and IPv6 CIDRs on TCP or all protocols; routing, NACLs, attached workloads and end-to-end reachability are not modeled."
+  ],
+  "reason": "World-address ingress includes administrative TCP ports; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"
+  ],
+  "remediation": "Restrict TCP 22 and 3389 to approved source networks or use an authenticated management path.",
+  "resource_id": "sg-workload",
+  "resource_type": "security_group",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "World-address ingress includes administrative TCP ports"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "NET-002",
+    "resource_id": "sg-workload",
+    "resource_type": "security_group",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "id": "sg-workload",
+    "ingress": [
+      {
+        "cidr": "0.0.0.0/0",
+        "from_port": 443,
+        "protocol": "tcp",
+        "to_port": 443
+      },
+      {
+        "cidr": "10.0.0.0/8",
+        "from_port": 22,
+        "protocol": "tcp",
+        "to_port": 22
+      }
+    ],
+    "region": "us-east-1"
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "NET-002",
+  "evidence": [
+    {
+      "cidr": "0.0.0.0/0",
+      "from_port": null,
+      "protocol": "-1",
+      "to_port": null
+    }
+  ],
+  "finding_id": "finding-c2b24a1f9338307b12818e39",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Checks only explicit /0 CIDRs, not equivalent unions of smaller networks or security-group references."
+  ],
+  "reason": "World-address ingress permits all protocols; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"
+  ],
+  "remediation": "Replace world-address all-protocol ingress with the specific source networks, protocols and ports needed.",
+  "resource_id": "sg-workload",
+  "resource_type": "security_group",
+  "severity": "HIGH",
+  "status": "VERIFIED_CLOSED",
+  "title": "World-address ingress permits all protocols"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-001",
+    "resource_id": "synthetic-data",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-data",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-001",
+  "evidence": [
+    {
+      "disabled_bucket_settings": [
+        "block_public_policy"
+      ]
+    }
+  ],
+  "finding_id": "finding-a915319033e3057c2d99c483",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Disabled bucket settings do not prove public access; policies, ACLs and account/organization guardrails are not modeled."
+  ],
+  "reason": "Bucket public-access guardrail gap; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+  ],
+  "remediation": "Enable all four bucket Block Public Access settings after confirming intended application access.",
+  "resource_id": "synthetic-data",
+  "resource_type": "s3_bucket",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Bucket public-access guardrail gap"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-001",
+    "resource_id": "synthetic-logs",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-logs",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-001",
+  "evidence": [
+    {
+      "disabled_bucket_settings": [
+        "block_public_policy"
+      ]
+    }
+  ],
+  "finding_id": "finding-87b1f6a52d78c11341d809bc",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Disabled bucket settings do not prove public access; policies, ACLs and account/organization guardrails are not modeled."
+  ],
+  "reason": "Bucket public-access guardrail gap; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+  ],
+  "remediation": "Enable all four bucket Block Public Access settings after confirming intended application access.",
+  "resource_id": "synthetic-logs",
+  "resource_type": "s3_bucket",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Bucket public-access guardrail gap"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-002",
+    "resource_id": "synthetic-data",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-data",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-002",
+  "evidence": [
+    {
+      "encryption": {
+        "algorithm": "AES256",
+        "key_id": null,
+        "key_manager": null
+      },
+      "sensitive": true
+    }
+  ],
+  "finding_id": "finding-2064814e5ec03e41ffa126f2",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "AES256 is encrypted; this checks a lab KMS requirement, not absence of encryption. Existing objects and key-policy usability are not evaluated."
+  ],
+  "reason": "Sensitive bucket lacks required customer-managed SSE-KMS configuration; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+  ],
+  "remediation": "Configure default SSE-KMS using a customer-managed key for this lab's sensitive-data baseline.",
+  "resource_id": "synthetic-data",
+  "resource_type": "s3_bucket",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Sensitive bucket lacks required customer-managed SSE-KMS configuration"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-002",
+    "resource_id": "synthetic-logs",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-logs",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-002",
+  "evidence": [
+    {
+      "encryption": {
+        "algorithm": "AES256",
+        "key_id": null,
+        "key_manager": null
+      },
+      "sensitive": true
+    }
+  ],
+  "finding_id": "finding-6c87874d936c638bc8a11a44",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "AES256 is encrypted; this checks a lab KMS requirement, not absence of encryption. Existing objects and key-policy usability are not evaluated."
+  ],
+  "reason": "Sensitive bucket lacks required customer-managed SSE-KMS configuration; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+  ],
+  "remediation": "Configure default SSE-KMS using a customer-managed key for this lab's sensitive-data baseline.",
+  "resource_id": "synthetic-logs",
+  "resource_type": "s3_bucket",
+  "severity": "MEDIUM",
+  "status": "VERIFIED_CLOSED",
+  "title": "Sensitive bucket lacks required customer-managed SSE-KMS configuration"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-003",
+    "resource_id": "synthetic-data",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-data",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-003",
+  "evidence": [
+    {
+      "versioning": false
+    }
+  ],
+  "finding_id": "finding-459b5a99ac739f2905a287e1",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Versioning is a recovery setting, not immutable retention or proof that backups can be restored."
+  ],
+  "reason": "Bucket versioning is disabled; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+  ],
+  "remediation": "Enable bucket versioning and choose lifecycle retention suitable for recovery requirements.",
+  "resource_id": "synthetic-data",
+  "resource_type": "s3_bucket",
+  "severity": "LOW",
+  "status": "VERIFIED_CLOSED",
+  "title": "Bucket versioning is disabled"
+}
+```
+
+```json
+{
+  "after_evaluation": {
+    "control_id": "S3-003",
+    "resource_id": "synthetic-logs",
+    "resource_type": "s3_bucket",
+    "status": "PASS"
+  },
+  "after_resource": {
+    "block_public_access": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true
+    },
+    "encryption": {
+      "algorithm": "aws:kms",
+      "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+      "key_manager": "CUSTOMER"
+    },
+    "id": "synthetic-logs",
+    "region": "us-east-1",
+    "sensitive": true,
+    "versioning": true
+  },
+  "after_status": "PASS",
+  "before_status": "FAIL",
+  "control_id": "S3-003",
+  "evidence": [
+    {
+      "versioning": false
+    }
+  ],
+  "finding_id": "finding-9811bab28943694633b640ed",
+  "limitations": [
+    "Synthetic supplied inventory only; completeness and live AWS state are not verified.",
+    "Versioning is a recovery setting, not immutable retention or proof that backups can be restored."
+  ],
+  "reason": "Bucket versioning is disabled; observed in the supplied synthetic snapshot.",
+  "references": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+  ],
+  "remediation": "Enable bucket versioning and choose lifecycle retention suitable for recovery requirements.",
+  "resource_id": "synthetic-logs",
+  "resource_type": "s3_bucket",
+  "severity": "LOW",
+  "status": "VERIFIED_CLOSED",
+  "title": "Bucket versioning is disabled"
+}
+```
+
+## New Findings
+
+None.

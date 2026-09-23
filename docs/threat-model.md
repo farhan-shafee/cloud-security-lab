@@ -1,63 +1,41 @@
 # Threat model
 
-Scoped to the account in `docs/architecture.md`. The framing is attacker-goal
-first: what someone would actually be trying to do, the technique they'd reach
-for, the signal it leaves, and the control that's supposed to catch it. ATT&CK
-technique IDs are included where they map cleanly so the detections downstream
-have something to anchor to.
+Two systems are in scope: the synthetic AWS-style environment and the local code/CI evaluating its fixtures. No live account is assessed. See [architecture](architecture.md).
 
-## In scope
+## Modeled cloud threats
 
-- IAM misuse and privilege escalation
-- Unauthorized or anomalous API activity
-- Suspicious interactive sign-ins
-- Object-storage exposure
+| Threat | Observable evidence | Response and limit |
+|---|---|---|
+| Overprivileged identities | Broad Allow actions/resources, IAM mutations, role passing | Static findings inspect selected patterns; no effective-permission calculation. |
+| Unsafe trust | Broad principals and unconditioned external account/root trust | Trust-document checks; no organization graph or full condition evaluation. |
+| Credential misuse | Root API use, IAM-user login explicitly reporting no MFA, access-key creation | Review alerts preserve evidence. Authorization and compromise need human context. |
+| Public exposure | Missing bucket guardrails and world-open security-group rules | Fixture configuration checks; no reachability scan or full bucket-policy evaluation. |
+| Encryption policy gap | Sensitive bucket not meeting customer-managed SSE-KMS requirement | Configuration intent only; no ciphertext or key-policy verification. |
+| Logging disablement | Trail configuration gaps or successful StopLogging/DeleteTrail | Findings and alerts; configuration does not prove delivery or retention. |
+| Security-control modification | Policy-version change followed by logging disablement | Explicit bounded correlation raises investigation priority, not a malicious verdict. |
 
-Out of scope for this lab: application-layer vulns in the mock app, supply-chain
-compromise of the deployment pipeline, and anything requiring a second account.
+The lab does not infer an attack path merely because multiple findings exist. Correlation requires documented account, principal/session, ordering, and time-window predicates.
 
-## Scenarios
+## Lab trust boundaries
 
-### 1. Stolen credentials, used directly (T1078 — Valid Accounts)
+| Boundary / failure | Mitigation | Residual risk |
+|---|---|---|
+| Fixture author → parser | Versioned contracts, type/duplicate checks, malformed-input tests | Valid but fabricated or incomplete data remains possible. |
+| Parser → evaluator | Explicit supported fields and IAM constructs; reject unsupported semantics | Many valid AWS configurations remain unsupported. |
+| Repository → ground truth | Expected results separate from evaluator; positive/negative/boundary tests | A contributor can alter both code and answers; review remains necessary. |
+| Assessment → closure | Re-assessment of later compatible snapshots; unresolved/new findings retained | No proof of deployment, persistence, or unmodeled risk removal. |
+| Source bytes → report | Source hashes, stable IDs, deterministic output | Hashes are not signatures or trusted timestamps. |
+| Events → triage | Source IDs, actor, timestamp, evidence, bounded correlation | Missing events, clock issues, or other attack sequences can evade detection. |
+| Dependencies / CI → result | Minimal runtime, constrained tooling, tests, repository security gates | Compromised tooling/Actions could falsify evidence; workflow changes need review. |
 
-An attacker with a leaked access key or password signs in and operates as a
-legitimate user. The tell in this lab is a `ConsoleLogin` with `MFAUsed = "No"`
-from an unfamiliar IP — `examples/events/cloudtrail-consolelogin-no-mfa.json`.
+## False positives and false negatives
 
-- **Control:** enforce MFA on all interactive users; alert on the gap.
-- **Why it's nasty:** valid creds blend in. Detection leans on *where* and *when*
-  more than *who*.
+Authorized policy changes and key creation can produce review alerts. There is no ticket system, geolocation baseline, behavioral model, or business authorization context. Console MFA detection requires an explicit `No` for an IAM user; absent data and federated logins do not prove missing MFA.
 
-### 2. Privilege escalation via policy edit (T1098 — Account Manipulation)
+IAM findings can persist despite a restrictive Deny, boundary, SCP, or condition because their combined effect is not evaluated. An unflagged policy can contain dangerous combinations outside the catalog. See [controls](controls.md) for unsupported semantics.
 
-A principal with `iam:CreatePolicyVersion` quietly widens a policy it's attached
-to, then uses the new permissions. The signal is an IAM write event outside any
-change window, especially one that adds `Action: *` or `Resource: *`.
+## Secrets and scope
 
-- **Control:** restrict who can edit IAM; diff every policy version; alert on
-  wildcard expansion. `analyze_policy.py` is the offline version of that check.
+Use invented account/principal IDs and reserved documentation IPs. Do not commit credentials, customer logs, real snapshots, or private identifiers. Required flows need no AWS credentials. Follow [SECURITY.md](../SECURITY.md) if sensitive data is discovered.
 
-### 3. Reconnaissance (T1580 — Cloud Infrastructure Discovery)
-
-Before doing damage, an attacker enumerates: `ListBuckets`, `ListRoles`,
-`GetAccountAuthorizationDetails`, `DescribeInstances`. A burst of `List*` /
-`Describe*` calls from one principal in a short window is the pattern.
-
-- **Control:** baseline normal API volume per principal; alert on discovery
-  spikes. High-noise on its own, so it's a *correlation* signal, not a page.
-
-### 4. Data exposure (T1530 — Data from Cloud Storage)
-
-A bucket policy or ACL is loosened to public, or a broad `s3:GetObject` grant
-lets the wrong principal read application data.
-
-- **Control:** block public access at the account level; scope storage grants to
-  a single bucket and prefix, as `least-privilege-policy.json` does.
-
-## Residual risk
-
-Even with every control above in place, compromised *legitimate* credentials
-used *carefully* will look like normal activity. There is no clean detection for
-"the right user doing the right things for the wrong reason." That gap is why the
-lab leans on continuous logging and periodic policy review rather than assuming
-any single alert will catch everything.
+Out of scope: application exploitation, live containment, organization-wide authorization analysis, cloud deployment, cryptographic CloudTrail verification, or integrations with Security Hub, GuardDuty, Config, Inspector, and IAM Access Analyzer.

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-security-lab"
+version = "1.0.0"
+description = "Deterministic synthetic AWS-style posture, detection and remediation verification"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<10", "ruff>=0.14,<0.17", "mypy>=1.15,<3",
+  "bandit>=1.8,<2", "pip-audit>=2.9,<3", "PyYAML>=6.0.2,<7",
+  "build>=1.2,<2",
+]
+
+[project.scripts]
+cloud-security-lab = "cloud_security_lab.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cloud_security_lab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["cloud_security_lab"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+
+[tool.bandit]
+targets = ["cloud_security_lab", "scripts"]

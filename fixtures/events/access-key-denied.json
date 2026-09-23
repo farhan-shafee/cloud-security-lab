@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "fixture_id": "access-key-denied",
+  "events": [
+    {
+      "eventID": "access-key",
+      "eventTime": "2026-01-10T14:00:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "CreateAccessKey",
+      "awsRegion": "us-east-1",
+      "recipientAccountId": "111122223333",
+      "userIdentity": {
+        "type": "IAMUser",
+        "arn": "arn:aws:iam::111122223333:user/lab-operator",
+        "accountId": "111122223333"
+      },
+      "sourceIPAddress": "198.51.100.24",
+      "eventType": "AwsApiCall",
+      "requestParameters": {
+        "userName": "lab-operator"
+      },
+      "responseElements": null,
+      "additionalEventData": {},
+      "errorCode": "AccessDenied"
+    }
+  ]
+}

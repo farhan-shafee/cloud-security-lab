@@ -1,40 +1,11 @@
-# Logging and monitoring setup
+# Logging review context
 
-What has to be captured for the detections and the runbook to have anything to
-work with. The detections are only as good as the data feeding them, so this is
-upstream of everything in `detections/`.
+This repository consumes synthetic CloudTrail-style events. It does not configure CloudTrail, receive live logs, or run GuardDuty.
 
-## What to capture
+Snapshot controls check whether a modeled trail is logging, whether its configured coverage includes required regions, and whether its referenced log bucket meets the lab's public-access, customer-managed SSE-KMS, and versioning baseline. These are configuration checks, not proof of delivery or forensic integrity. See [LOG-001 through LOG-003](../docs/controls.md).
 
-- **Management-plane API calls** — the CloudTrail equivalent. This is the
-  backbone; without it, the IAM and discovery detections have no input.
-- **Sign-in events** — interactive console and federated logins, including the
-  MFA flag. Feeds detection 1.
-- **Threat findings** — the GuardDuty-style layer that does anomaly detection for
-  you and emits findings like the one in `examples/events/`.
+A real collection design would additionally need management/data event selectors, enabled-region coverage, retention, protected delivery, account/organization scope, monitoring of delivery failures, and evidence integrity procedures. [AWS multi-Region trail behavior](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/receive-cloudtrail-log-files-from-multiple-regions.html).
 
-## Non-negotiables for the log pipeline
+Enabling CloudTrail log-file integrity validation produces digest files; it does not itself validate delivered logs. This lab neither models the setting nor verifies signed digests. Versioning is not Object Lock or immutability. [AWS log-file integrity validation](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html).
 
-1. **Multi-region.** An attacker will operate in whatever region you're not
-   logging. Trail coverage has to be all-region, not just `us-east-1`.
-2. **Tamper-evidence.** Logs land somewhere the workload identities can't edit or
-   delete — separate account or a write-once bucket. If the logs live where the
-   attacker lands, they aren't evidence.
-3. **Retention with a number on it.** "We keep logs" is not a control. Pick a
-   retention period and enforce it.
-
-## Monitoring use cases (where the detections come from)
-
-1. Console login without MFA.
-2. A burst of IAM policy changes.
-3. API calls from an unusual geo / ASN.
-4. Discovery / recon command spikes.
-
-## The triage flow these feed
-
-1. Validate the event is real and note its timestamp.
-2. Identify the actor, source IP, user agent, and action.
-3. Pull related events in the surrounding ~15 minutes.
-4. Classify severity, then escalate or remediate.
-
-That flow is worked in full in `docs/triage-runbook.md`.
+The event lane detects selected successful API operations and emits triage evidence. See [detection predicates](../detections/cloud-detections.md) and the [runbook](../docs/triage-runbook.md).

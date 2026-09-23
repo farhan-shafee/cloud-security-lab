@@ -1,0 +1,372 @@
+{
+  "alerts": [
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-c5e002a2eb825cb23dbc",
+      "detection_id": "DET-001",
+      "event_ids": [
+        "demo-root"
+      ],
+      "evidence": {
+        "event_name": "DescribeInstances",
+        "event_source": "ec2.amazonaws.com",
+        "identity_type": "Root",
+        "source_ip": "198.51.100.24"
+      },
+      "principal": "arn:aws:iam::111122223333:root",
+      "reason": "A successful API call used the root account identity.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "arn:aws:iam::111122223333:root",
+      "severity": "HIGH",
+      "timestamp": "2026-01-10T14:00:00Z",
+      "title": "Root account API use"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-e4316e02a1af498d1e64",
+      "detection_id": "DET-002",
+      "event_ids": [
+        "demo-login"
+      ],
+      "evidence": {
+        "console_login": "Success",
+        "event_name": "ConsoleLogin",
+        "event_source": "signin.amazonaws.com",
+        "mfa_used": "No",
+        "source_ip": "198.51.100.24"
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful IAM-user console login explicitly reports MFAUsed=No.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "arn:aws:iam::111122223333:user/lab-operator",
+      "severity": "MEDIUM",
+      "timestamp": "2026-01-10T14:01:00Z",
+      "title": "IAM user console login without MFA signal"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-a401d0e5df5e6927b4b0",
+      "detection_id": "DET-003",
+      "event_ids": [
+        "demo-key"
+      ],
+      "evidence": {
+        "event_name": "CreateAccessKey",
+        "event_source": "iam.amazonaws.com",
+        "source_ip": "198.51.100.24",
+        "target_user": "lab-operator"
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful CreateAccessKey call created a long-lived credential.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "lab-operator",
+      "severity": "MEDIUM",
+      "timestamp": "2026-01-10T14:02:00Z",
+      "title": "Access key created"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-ab7a038249e232a1bcb8",
+      "detection_id": "DET-004",
+      "event_ids": [
+        "demo-policy"
+      ],
+      "evidence": {
+        "event_name": "CreatePolicyVersion",
+        "event_source": "iam.amazonaws.com",
+        "policy_arn": "arn:aws:iam::111122223333:policy/lab-policy",
+        "source_ip": "198.51.100.24"
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful IAM call created or selected a managed policy version.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "arn:aws:iam::111122223333:policy/lab-policy",
+      "severity": "MEDIUM",
+      "timestamp": "2026-01-10T14:03:00Z",
+      "title": "IAM policy version modified"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-8bc4b2d558f83d10309f",
+      "detection_id": "DET-006",
+      "event_ids": [
+        "demo-ingress"
+      ],
+      "evidence": {
+        "event_name": "AuthorizeSecurityGroupIngress",
+        "event_source": "ec2.amazonaws.com",
+        "ingress": [
+          {
+            "from_port": 22,
+            "protocol": "tcp",
+            "to_port": 22,
+            "world_cidrs": [
+              "0.0.0.0/0"
+            ]
+          }
+        ],
+        "source_ip": "198.51.100.24"
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "Successful ingress permits world access to TCP 22/3389 or all protocols.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "sg-lab-admin",
+      "severity": "HIGH",
+      "timestamp": "2026-01-10T14:04:00Z",
+      "title": "Administrative ingress opened to the world"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-1cca721fbe9525c387d5",
+      "detection_id": "DET-005",
+      "event_ids": [
+        "demo-logging"
+      ],
+      "evidence": {
+        "event_name": "StopLogging",
+        "event_source": "cloudtrail.amazonaws.com",
+        "source_ip": "198.51.100.24",
+        "trail": "lab-trail"
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful call stopped logging or deleted the named trail.",
+      "references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "resource_id": "lab-trail",
+      "severity": "HIGH",
+      "timestamp": "2026-01-10T14:05:00Z",
+      "title": "Security logging disabled or trail deleted"
+    }
+  ],
+  "correlation_ids": [
+    "COR-001"
+  ],
+  "correlations": [
+    {
+      "account_id": "111122223333",
+      "alert_id": "correlation-d147e456e6cf8beaab5d",
+      "correlation_id": "COR-001",
+      "event_ids": [
+        "demo-policy",
+        "demo-logging"
+      ],
+      "evidence": {
+        "elapsed_seconds": 120,
+        "logging_event": "StopLogging",
+        "policy_arn": "arn:aws:iam::111122223333:policy/lab-policy",
+        "policy_event": "CreatePolicyVersion",
+        "trail": "lab-trail",
+        "window_seconds": 900
+      },
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "Same account and exact principal/session changed a policy then disabled logging within 15 minutes.",
+      "resource_id": "lab-trail",
+      "severity": "HIGH",
+      "timestamp": "2026-01-10T14:05:00Z",
+      "title": "IAM policy change followed by security logging disablement"
+    }
+  ],
+  "detection_ids": [
+    "DET-001",
+    "DET-002",
+    "DET-003",
+    "DET-004",
+    "DET-005",
+    "DET-006"
+  ],
+  "event_count": 6,
+  "fixture_id": "demo",
+  "schema_version": 1,
+  "source_sha256": "8ae0bc54a608f562e3694d32ad9f670e9e4b7163982dd16d4470379e1f9fc73c",
+  "synthetic": true,
+  "triage": [
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-c5e002a2eb825cb23dbc",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:root",
+      "reason": "A successful API call used the root account identity.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [],
+      "resource_id": "arn:aws:iam::111122223333:root",
+      "rule_id": "DET-001",
+      "source_event_ids": [
+        "demo-root"
+      ],
+      "timestamp": "2026-01-10T14:00:00Z",
+      "triage_id": "triage-144c3d80f2ad6d1cc8a8"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-e4316e02a1af498d1e64",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful IAM-user console login explicitly reports MFAUsed=No.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-key",
+        "demo-policy",
+        "demo-ingress",
+        "demo-logging"
+      ],
+      "resource_id": "arn:aws:iam::111122223333:user/lab-operator",
+      "rule_id": "DET-002",
+      "source_event_ids": [
+        "demo-login"
+      ],
+      "timestamp": "2026-01-10T14:01:00Z",
+      "triage_id": "triage-1ae22231e8954e8722ad"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-a401d0e5df5e6927b4b0",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful CreateAccessKey call created a long-lived credential.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-login",
+        "demo-policy",
+        "demo-ingress",
+        "demo-logging"
+      ],
+      "resource_id": "lab-operator",
+      "rule_id": "DET-003",
+      "source_event_ids": [
+        "demo-key"
+      ],
+      "timestamp": "2026-01-10T14:02:00Z",
+      "triage_id": "triage-a539b959dbf00e6ea9a4"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-ab7a038249e232a1bcb8",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful IAM call created or selected a managed policy version.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-login",
+        "demo-key",
+        "demo-ingress",
+        "demo-logging"
+      ],
+      "resource_id": "arn:aws:iam::111122223333:policy/lab-policy",
+      "rule_id": "DET-004",
+      "source_event_ids": [
+        "demo-policy"
+      ],
+      "timestamp": "2026-01-10T14:03:00Z",
+      "triage_id": "triage-7353887e9925939ebd28"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-8bc4b2d558f83d10309f",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "Successful ingress permits world access to TCP 22/3389 or all protocols.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-login",
+        "demo-key",
+        "demo-policy",
+        "demo-logging"
+      ],
+      "resource_id": "sg-lab-admin",
+      "rule_id": "DET-006",
+      "source_event_ids": [
+        "demo-ingress"
+      ],
+      "timestamp": "2026-01-10T14:04:00Z",
+      "triage_id": "triage-991d3c305f6ee8ac64e2"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "correlation-d147e456e6cf8beaab5d",
+      "disposition": "ESCALATE",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "Same account and exact principal/session changed a policy then disabled logging within 15 minutes.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-login",
+        "demo-key",
+        "demo-ingress"
+      ],
+      "resource_id": "lab-trail",
+      "rule_id": "COR-001",
+      "source_event_ids": [
+        "demo-policy",
+        "demo-logging"
+      ],
+      "timestamp": "2026-01-10T14:05:00Z",
+      "triage_id": "triage-3a1f5bfc1103f2801d69"
+    },
+    {
+      "account_id": "111122223333",
+      "alert_id": "alert-1cca721fbe9525c387d5",
+      "disposition": "REVIEW",
+      "principal": "arn:aws:iam::111122223333:user/lab-operator",
+      "reason": "A successful call stopped logging or deleted the named trail.",
+      "recommended_steps": [
+        "Confirm source-event integrity and identity/session attribution.",
+        "Compare the action and target with an authorized change record.",
+        "Inspect related activity and affected configuration before deciding intent.",
+        "Record the human disposition; escalate unauthorized changes for response."
+      ],
+      "related_event_ids": [
+        "demo-login",
+        "demo-key",
+        "demo-policy",
+        "demo-ingress"
+      ],
+      "resource_id": "lab-trail",
+      "rule_id": "DET-005",
+      "source_event_ids": [
+        "demo-logging"
+      ],
+      "timestamp": "2026-01-10T14:05:00Z",
+      "triage_id": "triage-2674d56d55ae8943c125"
+    }
+  ]
+}

@@ -2,7 +2,10 @@
 
 Running notes on why the lab is built the way it is. Kept in rough date order;
 newest decisions get appended at the bottom. This is the "show your working"
-file — the reasoning that didn't fit anywhere else.
+file — the reasoning that didn't fit anywhere else. Entries before September
+2026 describe the earlier lab; current behavior is documented in the README and
+control catalog. Historical claims of Sigma portability were not verified by
+backend conversion or execution.
 
 ## 2025-11-29 — starting with identity
 
@@ -41,9 +44,18 @@ it's a file listing. Added `analyze_policy.py` so there's a real check with an
 opinion: it reads a policy and fails CI on a wildcard grant. The over-privileged
 sample is now also a test fixture — CI confirms the linter still catches it.
 
-## Things I'd add next
+## 2026-09-23 — executable evidence
 
-- A second account to model cross-account `AssumeRole` trust abuse.
-- A Terraform module so the "before" state is reproducible, not just described.
-- One detection with a deliberately high false-positive rate, plus the tuning
-  notes — because learning to *tune* a rule matters more than learning to write one.
+The current design makes assessment and closure reproducible from versioned
+snapshots. Typed loaders reject unsupported input; controls produce evidence;
+event detections include negative fixtures; and the verifier re-assesses a later
+snapshot instead of trusting a manually edited status.
+
+Terraform was intentionally omitted because static JSON already captures the
+required state. Cross-account trust is represented by explicit policy principals,
+not a deployed second account. A bounded event sequence provides correlation
+without a graph database or behavioral claims. The earlier discovery Sigma
+aggregation remains an unsupported historical reference.
+
+Future live collection would require an independently reviewed read-only adapter
+and authenticated coverage evidence. It is outside the current workflow.

@@ -3,6 +3,22 @@
 Notable changes to the lab. Dates are when the work actually landed; versions are
 just milestones, not releases of anything.
 
+## Unreleased
+
+### Changed
+- Evolved the lab into a credential-free Python assessment, detection, triage,
+  and synthetic remediation-verification workflow.
+- Preserved the standalone IAM analyzer interface while expanding static checks
+  and making unsupported policy constructs explicit errors.
+- Added versioned typed snapshots, 14 posture controls, normalized findings,
+  positive/negative/boundary fixtures, and separate ground truth.
+- Added six event detections and one explicit account/session-aware sequence.
+- Replaced handwritten assessment claims with generated JSON/Markdown evidence.
+- Added cross-platform CLI/demo, pytest, lint/format/type checks, and repository
+  security gates. Executed results are recorded in `docs/VALIDATION.md`.
+- Corrected IAM/S3/logging claims, replaced weak compliance mappings with AWS
+  references, and labeled Sigma/GuardDuty material according to its actual scope.
+
 ## [0.6.0] - 2026-06-08
 
 ### Fixed

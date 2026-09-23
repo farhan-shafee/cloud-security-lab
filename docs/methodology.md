@@ -1,60 +1,24 @@
 # Methodology
 
-The lab follows the same loop a small security team would use to assess one
-account: figure out what you're protecting, work out how it could go wrong,
-check the controls that are supposed to stop that, practice triaging the alerts
-those controls produce, and write the result down so it can be acted on.
+The lab demonstrates configuration findings and suspicious event sequences using explicitly synthetic input.
 
-## The loop
+1. Validate a versioned snapshot and assess the implemented [control predicates](controls.md).
+2. Produce findings with fixed severity, affected resource, evidence, reason, remediation, and references.
+3. Evaluate audit events using documented [detection predicates](../detections/cloud-detections.md). Review the resulting triage records; an alert is not proof of compromise.
+4. Correct the modeled configuration in a later snapshot.
+5. Re-assess both snapshots and verify the original conditions no longer fail.
+6. Preserve generated JSON and Markdown evidence with fixture provenance.
 
-1. **Scope the environment.** Identify the assets, the identities that can touch
-   them, and the boundaries between trust levels. This is `docs/architecture.md`.
-2. **Model the threats.** Work top-down from attacker goals (STRIDE as a prompt,
-   ATT&CK for the specific techniques) rather than enumerating every control.
-   This is `docs/threat-model.md`.
-3. **Review the controls.** Compare the actual config against a baseline for IAM,
-   logging, and network exposure — see `baseline-configs/` and `examples/`.
-4. **Triage.** Take the events the controls generate and decide, for each one,
-   whether it's noise, something to watch, or something to escalate. This is
-   `docs/triage-runbook.md`.
-5. **Write it up.** Every finding gets an observation, an impact, evidence, and a
-   fix someone can verify. This is `reports/`.
+`python -m cloud_security_lab demo` runs this sequence on committed inputs. It writes reports, not changes to AWS. Correcting configuration does not erase historical alerts.
 
-Steps 3-5 are where most of the time goes, which matches real work: the hard
-part is rarely knowing that MFA is good, it's deciding whether *this* login at
-*this* time is a problem and writing it up convincingly.
+## Severity and scope
 
-## How findings are rated
+Each control/detection assigns a documented severity. Severity expresses the lab's prioritization policy for that condition, not a numeric breach probability. There is no aggregate score, certification, or claim that a zero-finding snapshot is universally secure.
 
-Severity is `likelihood x impact`, kept deliberately coarse so it's defensible
-in a five-minute conversation rather than precise to two decimal places.
+Static IAM findings describe statement patterns even when another policy or condition could constrain effective access. Passing the analyzer does not prove least privilege: task requirements, other policies, service authorization, and runtime context remain outside the model.
 
-| | Low impact | Medium impact | High impact |
-|---|---|---|---|
-| **High likelihood** | Low | Medium | High |
-| **Medium likelihood** | Low | Medium | High |
-| **Low likelihood** | Info | Low | Medium |
+## Evidence standard
 
-A finding that scores High but has a cheap, obvious fix (enable MFA) still gets
-written up plainly — severity drives urgency, not how much prose it gets.
+A reviewer must be able to identify the input, repeat the command, inspect the condition, and understand the limits. Expected results are separate from evaluators. Rejected input is an error, not a passing assessment.
 
-## What a finding has to contain
-
-A finding nobody can act on is just an opinion. Each one in this lab carries:
-
-- **Observation** — what was seen, stated plainly.
-- **Why it matters** — the impact in terms of the asset, not the control.
-- **Evidence** — a specific event or policy snippet, pointed to by file.
-- **Recommendation** — a concrete fix.
-- **Validation** — how to confirm the fix actually took.
-
-## Mapping to roles
-
-The same artifacts read differently depending on the seat:
-
-- **SOC analyst** lives in the triage runbook and the event samples — speed and
-  correct escalation.
-- **Security analyst** lives in the findings and the report — risk articulation
-  and a write-up a stakeholder will read.
-- **Cloud security engineer** lives in the IAM baseline and `analyze_policy.py` —
-  getting the control right once so it holds.
+See [VALIDATION.md](VALIDATION.md) for executed checks, [remediation verification](remediation-checklist.md) for closure rules, and the [threat model](threat-model.md) for coverage limits.

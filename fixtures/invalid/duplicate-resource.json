@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "snapshot_id": "secure-20260923",
+  "account_id": "111122223333",
+  "captured_at": "2026-09-23T12:00:00Z",
+  "required_regions": [
+    "us-east-1",
+    "us-west-2"
+  ],
+  "resources": {
+    "policies": [
+      {
+        "id": "workload-policy",
+        "document": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "ReadObjects",
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Resource": "arn:aws:s3:::synthetic-data/*"
+            }
+          ]
+        }
+      }
+    ],
+    "roles": [
+      {
+        "id": "workload-role",
+        "trust_policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "buckets": [
+      {
+        "id": "synthetic-data",
+        "region": "us-east-1",
+        "sensitive": true,
+        "block_public_access": {
+          "block_public_acls": true,
+          "ignore_public_acls": true,
+          "block_public_policy": true,
+          "restrict_public_buckets": true
+        },
+        "encryption": {
+          "algorithm": "aws:kms",
+          "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+          "key_manager": "CUSTOMER"
+        },
+        "versioning": true
+      },
+      {
+        "id": "synthetic-logs",
+        "region": "us-east-1",
+        "sensitive": true,
+        "block_public_access": {
+          "block_public_acls": true,
+          "ignore_public_acls": true,
+          "block_public_policy": true,
+          "restrict_public_buckets": true
+        },
+        "encryption": {
+          "algorithm": "aws:kms",
+          "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+          "key_manager": "CUSTOMER"
+        },
+        "versioning": true
+      },
+      {
+        "id": "synthetic-data",
+        "region": "us-east-1",
+        "sensitive": true,
+        "block_public_access": {
+          "block_public_acls": true,
+          "ignore_public_acls": true,
+          "block_public_policy": true,
+          "restrict_public_buckets": true
+        },
+        "encryption": {
+          "algorithm": "aws:kms",
+          "key_id": "arn:aws:kms:us-east-1:111122223333:key/11111111-2222-4333-8444-555555555555",
+          "key_manager": "CUSTOMER"
+        },
+        "versioning": true
+      }
+    ],
+    "security_groups": [
+      {
+        "id": "sg-workload",
+        "region": "us-east-1",
+        "ingress": [
+          {
+            "protocol": "tcp",
+            "from_port": 443,
+            "to_port": 443,
+            "cidr": "0.0.0.0/0"
+          },
+          {
+            "protocol": "tcp",
+            "from_port": 22,
+            "to_port": 22,
+            "cidr": "10.0.0.0/8"
+          }
+        ]
+      }
+    ],
+    "trails": [
+      {
+        "id": "account-trail",
+        "home_region": "us-east-1",
+        "is_logging": true,
+        "is_multi_region": true,
+        "covered_regions": [
+          "us-east-1",
+          "us-west-2"
+        ],
+        "log_bucket": "synthetic-logs"
+      }
+    ]
+  }
+}

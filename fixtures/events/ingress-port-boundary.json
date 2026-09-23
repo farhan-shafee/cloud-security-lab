@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "fixture_id": "ingress-port-boundary",
+  "events": [
+    {
+      "eventID": "ingress",
+      "eventTime": "2026-01-10T14:00:00Z",
+      "eventSource": "ec2.amazonaws.com",
+      "eventName": "AuthorizeSecurityGroupIngress",
+      "awsRegion": "us-east-1",
+      "recipientAccountId": "111122223333",
+      "userIdentity": {
+        "type": "IAMUser",
+        "arn": "arn:aws:iam::111122223333:user/lab-operator",
+        "accountId": "111122223333"
+      },
+      "sourceIPAddress": "198.51.100.24",
+      "eventType": "AwsApiCall",
+      "requestParameters": {
+        "groupId": "sg-lab-admin",
+        "ipPermissions": {
+          "items": [
+            {
+              "ipProtocol": "tcp",
+              "fromPort": 23,
+              "toPort": 3388,
+              "ipRanges": {
+                "items": [
+                  {
+                    "cidrIp": "0.0.0.0/0"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "responseElements": null,
+      "additionalEventData": {}
+    }
+  ]
+}

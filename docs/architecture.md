@@ -1,75 +1,39 @@
-# Lab architecture
+# Architecture
 
-The lab models a single cloud account running one small application, plus the
-identity, logging, and detection services around it. It's deliberately minimal —
-just enough surface area to produce interesting IAM decisions and a few alerts
-worth triaging.
+The lab is a local Python package. JSON files supply synthetic cloud state and audit events. There is no AWS SDK, cloud connection, infrastructure, or hosted service.
 
 ```mermaid
-flowchart TB
-    subgraph internet [" "]
-        analyst([Security analyst])
-        attacker([External principal])
-    end
-
-    subgraph account [Cloud account]
-        direction TB
-
-        subgraph identity [Identity plane]
-            users[IAM users and roles]
-            policies[Policies / least privilege]
-        end
-
-        subgraph workload [Workload plane]
-            app[App service - mock]
-            compute[Compute instance]
-            bucket[(Object storage)]
-        end
-
-        subgraph detect [Audit and detection plane]
-            trail[CloudTrail-style events]
-            gd[GuardDuty-style findings]
-        end
-    end
-
-    soc[[Security operations:<br/>triage + findings]]
-
-    attacker -->|console / API| identity
-    analyst -->|read-only audit| detect
-    identity --> workload
-    workload --> trail
-    identity --> trail
-    trail --> gd
-    detect --> soc
-    soc -->|remediation| identity
+flowchart TD
+    snapshot[Synthetic snapshot JSON] --> loader[Versioned input validation]
+    loader --> posture[Static IAM and posture controls]
+    posture --> findings[Findings with resource and evidence]
+    later[Later synthetic snapshot] --> reassess[Re-assessment]
+    reassess --> verification[Compare control results and resource identity]
+    findings --> verification
+    events[Synthetic audit-event JSON] --> normalize[Validate and normalize events]
+    normalize --> detection[Deterministic detections]
+    detection --> correlation[Bounded event correlation]
+    detection --> triage[Analyst triage records]
+    correlation --> triage
+    findings --> reports[JSON and Markdown evidence]
+    verification --> reports
+    triage --> reports
 ```
 
 ## Trust boundaries
 
-The interesting decisions happen where one trust level hands off to another.
-There are four worth naming:
+- **Input to evaluator:** fixtures are untrusted data. Validation rejects malformed supported fields and unsupported schema versions. A valid fixture can still contain false assertions; this is not authenticated cloud evidence.
+- **IAM document to finding:** selected risky statement patterns produce findings. The analyzer does not compute AWS effective permissions.
+- **Assessment to verification:** closure is derived by assessing both snapshots. Editing an output status cannot close a finding. Missing resources or incompatible snapshots must not be mistaken for a verified fix.
+- **Event to alert:** explicit predicates produce reviewable evidence, not declarations that an actor is malicious.
+- **Code to ground truth:** expected results live in fixture manifests/tests, separately from evaluators. Tests cover negative cases and boundaries as well as the demo.
 
-1. **Internet to control plane.** Anything reaching the console or API from
-   outside. This is where the no-MFA console login in `examples/events/` lands.
-2. **Human identity to account roles.** A person assuming a role is the moment a
-   small permission mistake becomes a large blast radius — hence the weight on
-   IAM review.
-3. **Workload to logging.** Resources have to emit to CloudTrail/GuardDuty
-   without being able to tamper with what they emitted. Log integrity is a
-   boundary, not a feature.
-4. **Analyst read access to findings.** The security-audit role can read logs and
-   findings but cannot change the workload. That separation is itself a control,
-   and it's modelled by `least-privilege-policy.json`.
+Reports include fixture metadata and source hashes. Hashes identify evaluated local bytes; they do not authenticate their author or establish a real account's state.
 
-## Design principles the lab assesses against
+## Design choices
 
-- **Least privilege by default.** Grants start at deny and open up only for a
-  named need. The two policies in `examples/iam/` are the before/after.
-- **Centralized, tamper-evident logging.** One place to look, and a retention
-  goal that assumes an attacker will try to cover their tracks.
-- **Detect → triage → remediate → re-validate.** A finding isn't closed when the
-  fix ships; it's closed when a re-run confirms the signal is gone.
+A standard-library runtime keeps the demo portable and credential-free. Control IDs, fixed severities, deterministic ordering, and stable finding IDs make results inspectable. No aggregate risk score hides the evidence.
 
-> If the Mermaid block above doesn't render in your viewer, GitHub and most
-> Markdown previews draw it inline. Reading the raw file, the block itself is
-> the source of truth for the layout.
+The original [IAM examples](../examples/iam/policy-analysis.md), [GuardDuty sample](../examples/events/guardduty-credential-access.json), and [Sigma references](../detections/cloud-detections.md) remain teaching artifacts. GuardDuty is not connected and Sigma is not loaded by the Python detector.
+
+Terraform and a live adapter were omitted because snapshots already provide reproducible configuration input. A future read-only adapter would need authenticated collection, coverage checks, pagination, least-privilege credentials, and live-data handling before its output could be trusted.

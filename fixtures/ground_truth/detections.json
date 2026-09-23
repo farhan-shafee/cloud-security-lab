@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "scenarios": [
+    {
+      "file": "root-api.json",
+      "alerts": [
+        {
+          "detection_id": "DET-001",
+          "event_ids": [
+            "root-api"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "root-denied.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "root-console-boundary.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "login-no-mfa.json",
+      "alerts": [
+        {
+          "detection_id": "DET-002",
+          "event_ids": [
+            "login"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "login-mfa.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "login-missing-mfa.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "login-failed.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "login-federated.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "access-key-created.json",
+      "alerts": [
+        {
+          "detection_id": "DET-003",
+          "event_ids": [
+            "access-key"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "access-key-denied.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "policy-version-created.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "policy-version"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "policy-default-version.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "policy-version"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "policy-version-denied.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "logging-stopped.json",
+      "alerts": [
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "logging-stop"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "logging-deleted.json",
+      "alerts": [
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "logging-stop"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "logging-denied.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "ingress-world-ipv4.json",
+      "alerts": [
+        {
+          "detection_id": "DET-006",
+          "event_ids": [
+            "ingress"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "ingress-world-ipv6.json",
+      "alerts": [
+        {
+          "detection_id": "DET-006",
+          "event_ids": [
+            "ingress"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "ingress-all-protocols.json",
+      "alerts": [
+        {
+          "detection_id": "DET-006",
+          "event_ids": [
+            "ingress"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "ingress-private.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "ingress-web.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "ingress-udp.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "ingress-port-boundary.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "ingress-denied.json",
+      "alerts": [],
+      "correlations": []
+    },
+    {
+      "file": "sequence-window-boundary.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": [
+        {
+          "correlation_id": "COR-001",
+          "event_ids": [
+            "sequence-policy",
+            "sequence-logging"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "sequence-outside-window.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-other-principal.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-other-account.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-other-session.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-reversed.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-simultaneous.json",
+      "alerts": [
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "sequence-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "sequence-failed-policy.json",
+      "alerts": [
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "sequence-logging"
+          ]
+        }
+      ],
+      "correlations": []
+    },
+    {
+      "file": "demo.json",
+      "alerts": [
+        {
+          "detection_id": "DET-001",
+          "event_ids": [
+            "demo-root"
+          ]
+        },
+        {
+          "detection_id": "DET-002",
+          "event_ids": [
+            "demo-login"
+          ]
+        },
+        {
+          "detection_id": "DET-003",
+          "event_ids": [
+            "demo-key"
+          ]
+        },
+        {
+          "detection_id": "DET-004",
+          "event_ids": [
+            "demo-policy"
+          ]
+        },
+        {
+          "detection_id": "DET-006",
+          "event_ids": [
+            "demo-ingress"
+          ]
+        },
+        {
+          "detection_id": "DET-005",
+          "event_ids": [
+            "demo-logging"
+          ]
+        }
+      ],
+      "correlations": [
+        {
+          "correlation_id": "COR-001",
+          "event_ids": [
+            "demo-policy",
+            "demo-logging"
+          ]
+        }
+      ]
+    }
+  ]
+}

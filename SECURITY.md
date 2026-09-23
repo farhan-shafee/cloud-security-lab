@@ -1,20 +1,19 @@
 # Security policy
 
-This repository is a learning lab. It runs on sample data and doesn't operate a
-production service, so the security concern here is narrow: not leaking anything
-real through the example files.
+This is an offline synthetic-data lab with no production service. Its relevant security concerns include committed secrets, unsafe input handling, incorrect security conclusions, and compromised development or CI tooling.
 
 ## Reporting
 
-If you spot a problem in the repo contents — an accidentally committed secret, a
-sample that contains real data — open a private report through the repository's
-security advisories, or contact the maintainer directly. Please don't open a
-public issue for anything that looks like a live credential.
+Report suspected live credentials or private data through GitHub private vulnerability reporting if enabled, or contact the maintainer privately. Do not post credentials in public issues. Ordinary correctness bugs and reproducible false positives can be reported publicly with synthetic inputs.
 
-## Handling sample data
+If a real credential is exposed, revoke/rotate it first and follow the owner's incident procedure before cleaning history. Deleting a file does not revoke a credential.
 
-- No real credentials, account IDs, or customer data. The samples use the
-  reserved documentation ranges (`198.51.100.0/24`, `203.0.113.0/24`) and AWS's
-  published example identifiers on purpose.
-- If a real key is ever committed by mistake, rotate and revoke it first, then
-  scrub the history.
+## Data and execution
+
+- Required commands need no AWS account, SDK, credentials, or paid resources.
+- Use invented identifiers and documentation address ranges. Never commit real account snapshots, customer logs, or credentials.
+- Fixture files are untrusted input; rejection must produce an explicit error, not a clean assessment.
+- Generated hashes identify input bytes; they do not authenticate AWS evidence.
+- Review changes to predicates, fixtures, expected results, dependencies, and Actions together.
+
+See the [threat model](docs/threat-model.md) and [validation record](docs/VALIDATION.md) for coverage and executed security checks. Reported findings are static lab observations, not complete AWS authorization decisions or incident verdicts.

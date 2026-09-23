@@ -1,25 +1,36 @@
 # Contributing
 
-This is a personal learning lab, but suggestions and fixes are welcome — a
-sharper detection, a more realistic sample event, a clearer write-up.
+Keep the lab reproducible from a clean clone without cloud credentials. Changes should improve executable evidence, security reasoning, or clarity.
 
-A few ground rules that keep it useful:
+- Use synthetic identifiers and documentation IP ranges; no real accounts, credentials, or customer logs.
+- Add controls only when the resource model and positive/negative tests support them.
+- Keep expected results separate from evaluator logic. Document unsupported semantics and error behavior.
+- Preserve deterministic IDs, ordering, and reports. Explain any intentional fixture/output changes.
+- Do not add live API calls, paid infrastructure, destructive automation, or unverified AWS-service claims.
 
-- **Keep it reproducible.** Anything added should run from a clean clone with no
-  cloud account attached.
-- **Sample data only.** No real credentials, account IDs, or customer data. Use
-  the documentation IP ranges and AWS's published example identifiers, as the
-  existing samples do.
-- **Don't overclaim.** This is a lab, not production experience, and the docs say
-  so. Keep it that way.
-- **Document the why.** New artifacts should come with enough context that
-  someone can tell what they're looking at and why it matters.
+## Development
 
-Before opening a PR, run:
+Python 3.11+; the same commands work in PowerShell and Linux shells from the repository root. An isolated virtual environment is recommended. Install development tooling and the package:
 
-```bash
-make validate
+```console
+python -m pip install -r requirements-dev.lock
+python -m pip install -e .
 ```
 
-CI runs the same check, plus byte-compiles the linter, so a green local run
-should mean a green PR.
+Run the checks that exercise a change:
+
+```console
+python -m ruff format --check .
+python -m ruff check .
+python -m mypy
+python -m pytest
+python -m cloud_security_lab validate-fixtures
+python scripts/validate_lab.py
+python -m cloud_security_lab demo
+python -m bandit -q -r cloud_security_lab scripts
+python -m pip_audit -r requirements-dev.lock
+```
+
+Dependency audit needs network access; assessment, detection, verification, and the demo do not. CI also runs Gitleaks against repository history and the source snapshot. Follow the exact configuration in [.github/workflows](.github/workflows/) and review [VALIDATION.md](docs/VALIDATION.md) for checks actually executed.
+
+`make` and the shell helper are conveniences; Windows does not require WSL. When intentionally refreshing committed evidence, run `python -m cloud_security_lab demo --output-dir reports/generated`, review the diff, and ensure that no local paths or secrets leaked into reports.

@@ -1,71 +1,99 @@
-# cloud-security-lab
+# Cloud Security Engineering Lab
 
-A hands-on lab for practicing the day-to-day work of a cloud security / SOC
-analyst: reading IAM policies and spotting the dangerous one, deciding whether a
-sign-in event is worth escalating, and writing findings so the person who has to
-fix them actually can.
+Deterministic AWS-style cloud posture assessment, audit-event detection, and remediation verification using synthetic fixtures.
 
-It runs entirely on sample data. There's no live AWS account wired up, so you can
-clone it, run the checks, change things, and re-run without spending a cent or
-touching anything real. The value is in the analysis and the write-ups, not the
-infrastructure.
+The lab demonstrates IAM least-privilege review, configuration checks, normalized findings, analyst triage, and evidence-backed closure. Everything runs locally without AWS credentials or paid resources. No AWS services are connected.
 
-> **Scope.** This is a learning lab, not a production hardening guide. The
-> detections are starting points that need tuning, and the sample events are
-> trimmed-down versions of the real records. Treat it as a worked example, not a
-> drop-in control set.
+## Quick demo
 
-## Quick start
+From the repository root with Python 3.11+; the same command works in PowerShell and Linux:
 
-```bash
-# structure + JSON/policy sanity checks
-make validate
-
-# lint an IAM policy for over-broad permissions
-python3 scripts/analyze_policy.py examples/iam/overprivileged-policy.json
+```console
+python -m cloud_security_lab demo
 ```
 
-Run against the deliberately-bad policy, `analyze_policy.py` prints:
+Actual demo summary:
 
-```
-examples/iam/overprivileged-policy.json
-  [CRITICAL] Statement "OverPrivileged": Action "*" grants every action in the account
-  [HIGH]     Statement "OverPrivileged": Resource "*" applies the grant to every resource
-  2 finding(s): 1 critical, 1 high
+```text
+Synthetic demo: 14 controls; 17 findings -> 17 VERIFIED_CLOSED; 6 alerts; 1 correlation(s).
 ```
 
-Point it at `least-privilege-policy.json` and it exits 0 with nothing to report.
+JSON and Markdown evidence is written to `artifacts/demo`. `make demo` is an optional equivalent; WSL is unnecessary. See the committed [generated reports](reports/sample-security-report.md) or the [six-minute walkthrough](docs/DEMO.md).
 
-## Repository layout
+## Workflow
 
-| Path | What's there |
-|------|--------------|
-| `docs/` | Methodology, architecture (with diagram), threat model, triage runbook, remediation checklist |
-| `baseline-configs/` | IAM and network baselines the lab assesses against |
-| `examples/iam/` | A deliberately over-privileged policy, a least-privilege counterpart, and a written analysis of both |
-| `examples/events/` | CloudTrail and GuardDuty sample records used by the detections and the runbook |
-| `detections/` | Detection logic in plain English, plus Sigma rules under `detections/sigma/` |
-| `reports/` | A worked findings list and an assessment report written the way you'd hand it to a stakeholder |
-| `scripts/` | `analyze_policy.py` (IAM linter) and `validate_lab.sh` (repo checks) |
-| `compliance-mapping.md` | Each lab control mapped to the relevant CIS / NIST reference |
+```text
+Synthetic snapshot → validation → 14 posture controls → normalized findings
+Later snapshot    → re-assessment → verified closure / unresolved / new findings
+Synthetic events  → normalization → 6 detections → bounded correlation → triage
+Both paths        → deterministic JSON and Markdown evidence
+```
 
-## Suggested reading order
+Controls cover selected IAM grants/trust, bucket guardrails/encryption/versioning, administrative network exposure, and audit logging. A policy-change → logging-disable sequence correlates only within the same account and exact principal/session, in order, within 15 minutes. [Architecture](docs/architecture.md) · [Control catalog](docs/controls.md) · [Detection predicates](detections/cloud-detections.md).
 
-Going through this cold, this order makes the most sense:
+## Generated example
 
-1. `docs/methodology.md` — how the assessment is framed.
-2. `docs/architecture.md` — the environment under test and where the trust boundaries sit.
-3. `examples/iam/policy-analysis.md` — the over-privileged vs. least-privilege walkthrough.
-4. `docs/triage-runbook.md`, with `examples/events/` open alongside, to work an alert end to end.
-5. `reports/sample-security-report.md` — where it all lands.
+Selected fields from the demo's `before.json`:
 
-## Requirements
+```json
+{
+  "control_id": "NET-001",
+  "severity": "HIGH",
+  "resource_id": "sg-workload",
+  "status": "OPEN",
+  "evidence": [
+    {"cidr": "0.0.0.0/0", "from_port": null, "protocol": "-1", "to_port": null},
+    {"cidr": "::/0", "from_port": 3389, "protocol": "tcp", "to_port": 3389}
+  ]
+}
+```
 
-- A POSIX shell (Linux, macOS, or WSL on Windows)
-- `python3` 3.8+ and `jq` for the validation script
+Selected fields from `verification.json` after assessing the remediated fixture:
 
-No cloud credentials or paid services are needed.
+```json
+{
+  "control_id": "NET-001",
+  "resource_id": "sg-workload",
+  "before_status": "FAIL",
+  "after_status": "PASS",
+  "status": "VERIFIED_CLOSED"
+}
+```
 
-## License
+This is **synthetic configuration remediation verification**. Closure is computed from a later compatible snapshot and a passing resource/control evaluation; editing a finding's status cannot close it.
 
-MIT — see [`LICENSE`](LICENSE).
+## Commands
+
+```console
+python -m cloud_security_lab assess fixtures/accounts/risky-environment.json
+python -m cloud_security_lab assess fixtures/accounts/secure-baseline.json --format json
+python -m cloud_security_lab detect fixtures/events/demo.json
+python -m cloud_security_lab verify fixtures/accounts/risky-environment.json fixtures/accounts/remediated-environment.json
+python -m cloud_security_lab validate-fixtures
+python scripts/analyze_policy.py examples/iam/subtle-overprivilege-policy.json
+```
+
+`assess`, `detect`, and `verify` support `--format text|json|markdown` and `--output PATH`. Assessment/detection exit 0 on valid input, or 1 on findings with `--fail-on-findings`. Verification exits 1 for unresolved/new findings; invalid input exits 2. The standalone policy linter retains its HIGH+ failure gate.
+
+## Validation
+
+```console
+python -m pip install -r requirements-dev.lock
+python -m pip install -e .
+python -m pytest
+python scripts/validate_lab.py
+```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) lists formatting, lint, typing, security, and dependency-audit commands. CI covers Windows/Linux and Python 3.11/3.14; [VALIDATION.md](docs/VALIDATION.md) records executed results and CI status. Expected outcomes live separately from evaluator code in `fixtures/ground_truth`.
+
+## Scope and limitations
+
+- IAM analysis is bounded static review, not the AWS effective-permission engine. Deny, conditions, other policies, and business requirements can change the meaning of a grant. Unsupported constructs fail explicitly.
+- Bucket guardrail gaps do not prove public exposure. SSE-S3 is encrypted; the lab's sensitive-bucket baseline specifically requires customer-managed SSE-KMS.
+- Configuration flags do not prove network reachability, log delivery, immutable retention, or deployed remediation. Input hashes identify bytes, not authenticated AWS evidence.
+- Alerts request review; correlation escalates priority without declaring an actor malicious. There is no production false-positive-rate claim.
+- No live AWS, native security-service integration, compliance certification, graph database, AI service, Terraform deployment, or destructive automation is included. Original Sigma and GuardDuty examples remain labeled references.
+
+[Fixture contracts](docs/fixtures.md) · [Threat model](docs/threat-model.md) · [Triage runbook](docs/triage-runbook.md) · [Interview notes](docs/INTERVIEW_NOTES.md) · [Portfolio summary](docs/PORTFOLIO_SUMMARY.md) · [Related AWS references](compliance-mapping.md).
+
+MIT licensed; see [LICENSE](LICENSE).

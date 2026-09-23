@@ -1,15 +1,19 @@
-.PHONY: validate lint tree help
-
+PYTHON ?= python
+.PHONY: help demo validate test lint format security
 help:
-	@echo "make validate  - structure, JSON, and linter self-test checks"
-	@echo "make lint       - run the IAM linter over every example policy"
-	@echo "make tree       - list tracked files"
-
+	@echo "demo, validate, test, lint, format, security (or use python -m commands)"
+demo:
+	$(PYTHON) -m cloud_security_lab demo
 validate:
-	./scripts/validate_lab.sh
-
+	$(PYTHON) scripts/validate_lab.py
+test:
+	$(PYTHON) -m pytest
 lint:
-	@python3 scripts/analyze_policy.py examples/iam/*.json || true
-
-tree:
-	@git ls-files 2>/dev/null || find . -type f -not -path './.git/*'
+	$(PYTHON) -m ruff check .
+	$(PYTHON) -m ruff format --check .
+	$(PYTHON) -m mypy
+format:
+	$(PYTHON) -m ruff format .
+security:
+	$(PYTHON) -m bandit -q -r cloud_security_lab scripts
+	$(PYTHON) -m pip_audit -r requirements-dev.lock

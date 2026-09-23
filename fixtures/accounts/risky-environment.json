@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "snapshot_id": "risky-20260923",
+  "account_id": "111122223333",
+  "captured_at": "2026-09-23T12:00:00Z",
+  "required_regions": [
+    "us-east-1",
+    "us-west-2"
+  ],
+  "resources": {
+    "policies": [
+      {
+        "id": "workload-policy",
+        "document": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "Overbroad",
+              "Effect": "Allow",
+              "Action": "*",
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    ],
+    "roles": [
+      {
+        "id": "workload-role",
+        "trust_policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "World",
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Principal": "*"
+            },
+            {
+              "Sid": "VendorRoot",
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Principal": {
+                "AWS": "arn:aws:iam::444455556666:root"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "buckets": [
+      {
+        "id": "synthetic-data",
+        "region": "us-east-1",
+        "sensitive": true,
+        "block_public_access": {
+          "block_public_acls": true,
+          "ignore_public_acls": true,
+          "block_public_policy": false,
+          "restrict_public_buckets": true
+        },
+        "encryption": {
+          "algorithm": "AES256",
+          "key_id": null,
+          "key_manager": null
+        },
+        "versioning": false
+      },
+      {
+        "id": "synthetic-logs",
+        "region": "us-east-1",
+        "sensitive": true,
+        "block_public_access": {
+          "block_public_acls": true,
+          "ignore_public_acls": true,
+          "block_public_policy": false,
+          "restrict_public_buckets": true
+        },
+        "encryption": {
+          "algorithm": "AES256",
+          "key_id": null,
+          "key_manager": null
+        },
+        "versioning": false
+      }
+    ],
+    "security_groups": [
+      {
+        "id": "sg-workload",
+        "region": "us-east-1",
+        "ingress": [
+          {
+            "protocol": "-1",
+            "from_port": null,
+            "to_port": null,
+            "cidr": "0.0.0.0/0"
+          },
+          {
+            "protocol": "tcp",
+            "from_port": 3389,
+            "to_port": 3389,
+            "cidr": "::/0"
+          }
+        ]
+      }
+    ],
+    "trails": [
+      {
+        "id": "account-trail",
+        "home_region": "us-east-1",
+        "is_logging": false,
+        "is_multi_region": false,
+        "covered_regions": [
+          "us-east-1"
+        ],
+        "log_bucket": "synthetic-logs"
+      }
+    ]
+  }
+}

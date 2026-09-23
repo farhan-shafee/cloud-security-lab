@@ -1,30 +1,10 @@
-# Network baseline
+# Network review baseline
 
-Identity gets most of the attention in this lab, but network exposure is the
-other half of the blast-radius question: even a well-scoped role doesn't help if
-the admin interface is on the public internet.
+The executable scope is security-group ingress configuration:
 
-## Principles
+- `NET-001`: world-open IPv4/IPv6 ingress permits TCP 22 or 3389, including all-protocol rules.
+- `NET-002`: world-open ingress permits all protocols.
 
-- **Inbound is closed until it has a reason to be open.** Required ports, from
-  required sources, and nothing else.
-- **Egress is monitored, not ignored.** Exfiltration and C2 leave by the same
-  door as legitimate traffic; unusual outbound destinations are worth an alert.
-- **Segment by trust level.** A compromised public-facing service shouldn't have
-  a flat path to the data tier.
+Both inspect explicit `/0` CIDRs. A `/0` all-protocol rule intentionally produces both findings: administrative exposure and unrestricted protocol exposure are separate conditions. Exact predicates and limitations are in the [control catalog](../docs/controls.md).
 
-## Controls the lab checks for
-
-1. No public admin interfaces (SSH, RDP, database ports) unless explicitly
-   justified and time-boxed.
-2. Internal workloads in private subnets, reachable only through a controlled
-   ingress point.
-3. Security-group / NACL rules written least-privilege, the same as IAM.
-4. Flow logs enabled, so "who talked to whom" is answerable after the fact.
-
-## Questions to ask
-
-- Which services are reachable from the internet, and does each one need to be?
-- Are management ports (22, 3389, 5432, ...) restricted to an approved source
-  range or a bastion?
-- Is there alerting on anomalous outbound traffic, or only inbound?
+The remediated fixture replaces world access with a synthetic approved source range. The lab does not scan hosts, evaluate routes/NACLs, model multiple attached security groups, analyze egress, or verify Flow Logs. Public reachability cannot be proven from this snapshot alone. Database ports, broad non-`/0` CIDRs, and source security-group references are outside the selected checks.

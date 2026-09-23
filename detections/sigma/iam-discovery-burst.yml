@@ -1,14 +1,15 @@
 title: IAM and Resource Discovery Burst
 id: 343f7daa-94f3-4269-8047-95304cc432ab
-status: experimental
+status: unsupported
 description: >
-  Detects a burst of enumeration calls from a single principal, a common
-  precursor to lateral movement. Intentionally high-recall: tune the count
-  threshold and aggregation window per environment before alerting on it.
+  Historical discovery-burst sketch using legacy Sigma aggregation syntax.
+  Preserved for discussion only: not executed by the Python engine, not
+  converted to a backend, and not a supported current Sigma correlation rule.
 references:
   - https://attack.mitre.org/techniques/T1580/
 author: Farhan Shafee
-date: 2026/03/08
+date: 2026-03-08
+modified: 2026-09-23
 logsource:
   product: aws
   service: cloudtrail

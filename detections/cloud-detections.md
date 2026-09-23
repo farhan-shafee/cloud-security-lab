@@ -1,65 +1,41 @@
-# Detections
+# Executable cloud-event detections
 
-Three detections, each written twice: once in plain English here (the reasoning),
-and once as a Sigma rule under `detections/sigma/` (the portable artifact). Sigma
-converts to Splunk SPL, Sentinel KQL, Elastic, and others, so the logic isn't
-welded to one backend.
+Run `python -m cloud_security_lab detect fixtures/events/demo.json`. The Python engine reads the versioned [event fixture contract](../docs/fixtures.md), normalizes timestamps, and evaluates the following predicates. It does not connect to CloudTrail or GuardDuty.
 
-Each one carries false-positive notes, because a detection without them is a
-pager that never sleeps. The honest measure of a rule is how well it survives
-contact with real traffic, not how cleanly it catches the one event you built it
-against.
+For all rules, success means no `errorCode`; ConsoleLogin additionally requires `responseElements.ConsoleLogin: Success`. Supported service/event combinations are explicit. Failed operations do not become successful-change alerts.
 
-## 1. Console login without MFA
+| ID | Severity | Exact trigger |
+|---|---|---|
+| DET-001 | HIGH | Successful event with root identity and `eventType: AwsApiCall`; root console login is outside this rule. |
+| DET-002 | MEDIUM | Successful `signin.amazonaws.com` ConsoleLogin by `IAMUser` with explicit `additionalEventData.MFAUsed: No`. Missing MFA data/federated login does not match. |
+| DET-003 | MEDIUM | Successful `iam.amazonaws.com` CreateAccessKey. |
+| DET-004 | MEDIUM | Successful `iam.amazonaws.com` CreatePolicyVersion or SetDefaultPolicyVersion. |
+| DET-005 | HIGH | Successful `cloudtrail.amazonaws.com` StopLogging or DeleteTrail. |
+| DET-006 | HIGH | Successful `ec2.amazonaws.com` AuthorizeSecurityGroupIngress adds an IPv4/IPv6 `/0` rule that allows TCP 22/3389 or all protocols. |
 
-**File:** `sigma/console-login-without-mfa.yml` · **Severity:** Medium · **T1078**
+Every alert includes source evidence and receives `REVIEW`. Root activity, key creation, or a policy edit can be authorized. The detector does not label actors malicious, diff policy versions, resolve tickets, or infer geography/reputation.
 
-Fire on a successful `ConsoleLogin` with `additionalEventData.MFAUsed = "No"`.
+## COR-001 — policy change followed by logging disablement
 
-```sql
--- reference SQL for a CloudTrail table; the Sigma rule is the source of truth
-SELECT eventTime, userIdentity.userName, sourceIPAddress
-FROM cloudtrail_events
-WHERE eventName = 'ConsoleLogin'
-  AND responseElements.ConsoleLogin = 'Success'
-  AND additionalEventData.MFAUsed = 'No';
-```
+Join a DET-004 event to a later DET-005 event only when:
 
-**Tuning.** The big false-positive source is federated sign-in, where MFA is
-enforced at the identity provider and AWS never sees it. If you use SAML/SSO,
-scope this rule to IAM-user logins or it will cry wolf on every SSO session. Keep
-a reviewed allowlist of any genuine break-glass accounts.
+- recipient account IDs match;
+- exact principal/session ARNs match;
+- the logging event is strictly later than the policy event;
+- elapsed time is at most 15 minutes, inclusive.
 
-## 2. IAM policy version change
+Inputs are sorted by normalized UTC timestamp and event ID before evaluation. Each logging event selects the nearest strictly earlier qualifying policy edit; ties resolve by event ID. Different accounts, principals, role sessions, reverse order, equal timestamps, failed calls, and out-of-window pairs do not correlate. A match is HIGH with `ESCALATE`, supported by both event IDs. It does not prove that the policy expanded access or caused the logging change.
 
-**File:** `sigma/iam-policy-version-change.yml` · **Severity:** Medium · **T1098**
+## Tuning and test evidence
 
-Fire on `CreatePolicyVersion` or `SetDefaultPolicyVersion`, then correlate
-against change tickets.
+Positive, negative, and boundary fixtures live under [fixtures/events](../fixtures/events). Expected detection/correlation results are separate from evaluator code. Tests cover explicit no-MFA versus missing data, unsuccessful operations, IPv6/all-protocol ingress, account/session isolation, and correlation timing.
 
-```sql
-SELECT eventTime, userIdentity.arn, eventName, sourceIPAddress
-FROM cloudtrail_events
-WHERE eventSource = 'iam.amazonaws.com'
-  AND eventName IN ('CreatePolicyVersion', 'SetDefaultPolicyVersion');
-```
+Approved maintenance can match these rules. A real deployment would need source completeness, field mapping, business context, and measured alert-volume tuning. This lab has no production false-positive rate to report. See [triage](../docs/triage-runbook.md) and [VALIDATION.md](../docs/VALIDATION.md).
 
-**Tuning.** Infrastructure-as-code pipelines do this all day. Filter on the
-CI/CD principal ARN so the rule only fires on *human* or *unexpected* IAM edits.
-The value-add over the raw event is the diff: pair the alert with
-`analyze_policy.py` against the new version to flag wildcard expansion
-automatically.
+## Preserved reference artifacts
 
-## 3. Discovery burst
+The three [Sigma files](sigma/) are educational references and are not the Python detector's source of truth. Console-login and policy-version rules have not been converted or tested against Splunk, Sentinel, or Elastic. Backend portability is therefore unverified.
 
-**File:** `sigma/iam-discovery-burst.yml` · **Severity:** Low · **T1580**
+`iam-discovery-burst.yml` is explicitly `unsupported`: it retains a historical legacy aggregation sketch, not executable coverage. Discovery-burst detection was omitted from the Python engine because the current workflow does not model an authorized enumeration baseline. [Sigma specification](https://sigmahq.io/sigma-specification/specification/sigma-rules-specification.html).
 
-Count `List*` / `Describe*` calls per principal in a short window; alert above a
-threshold.
-
-**Tuning.** This one is deliberately noisy and shipped at Low for a reason — it's
-a *correlation* signal, not a standalone page. CSPM tools, backup jobs, and the
-AWS console itself all enumerate constantly, so the threshold (`> 50` in 5
-minutes in the sample) and the allowlist matter more than the rule text. It earns
-its keep when it lines up with detection 1 or 2 on the same principal, not on its
-own.
+The original GuardDuty-shaped example is also illustrative only. Its fixed severity and anomaly text are fixture content, not output from a connected service or this detector.

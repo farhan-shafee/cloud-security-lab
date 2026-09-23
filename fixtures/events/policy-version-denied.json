@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "fixture_id": "policy-version-denied",
+  "events": [
+    {
+      "eventID": "policy-version",
+      "eventTime": "2026-01-10T14:00:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "CreatePolicyVersion",
+      "awsRegion": "us-east-1",
+      "recipientAccountId": "111122223333",
+      "userIdentity": {
+        "type": "IAMUser",
+        "arn": "arn:aws:iam::111122223333:user/lab-operator",
+        "accountId": "111122223333"
+      },
+      "sourceIPAddress": "198.51.100.24",
+      "eventType": "AwsApiCall",
+      "requestParameters": {
+        "policyArn": "arn:aws:iam::111122223333:policy/lab-policy"
+      },
+      "responseElements": null,
+      "additionalEventData": {},
+      "errorCode": "AccessDenied"
+    }
+  ]
+}
